@@ -1,22 +1,37 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
-import InitWizard from '@/components/ui/InitWizard';
-import CalibrationDialog from '@/components/ui/CalibrationDialog';
-import NarrativePanel from '@/components/ui/NarrativePanel';
-import ActionHUD from '@/components/ui/ActionHUD';
-import InfoCard from '@/components/ui/InfoCard';
+import { useState } from "react";
+import dynamic from "next/dynamic";
+import InitWizard from "@/components/ui/InitWizard";
+import CalibrationDialog from "@/components/ui/CalibrationDialog";
+import NarrativePanel from "@/components/ui/NarrativePanel";
+import ActionHUD from "@/components/ui/ActionHUD";
+import InfoCard from "@/components/ui/InfoCard";
+import { Card } from "@/components/ui/card";
+import { useEffect } from "react";
+import { applyDemoSeed, isDemo } from "@/lib/demo";
 
 // Dynamically import 3D scene to avoid SSR issues
-const BlueprintScene = dynamic(() => import('@/components/3d/BlueprintScene'), {
+const BlueprintScene = dynamic(() => import("@/components/3d/BlueprintScene"), {
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-white">Loading 3D Scene...</div>
+    <div className="flex h-full items-center justify-center">
+      <div className="text-foreground/70">Loading 3D Scene...</div>
     </div>
   ),
 });
+
+const EnergyPillar = dynamic(
+  () => import("@/components/3d/EnergyPillarSystemPro"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-foreground/70">Loading 3D Scene...</div>
+      </div>
+    ),
+  }
+);
 
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -27,46 +42,45 @@ export default function Home() {
     setShowCalibration(true);
   };
   
+  useEffect(() => {
+    if (isDemo()) {
+      applyDemoSeed();
+      setIsInitialized(true);
+      setShowCalibration(false);
+    }
+  }, []);
+  
   return (
-    <main className="h-screen w-screen overflow-hidden bg-black text-white">
-      {/* Init Wizard Modal */}
-      {!isInitialized && (
-        <InitWizard onInitComplete={handleInitComplete} />
-      )}
-      
-      {/* Calibration Dialog */}
-      <CalibrationDialog 
-        isOpen={showCalibration} 
-        onClose={() => setShowCalibration(false)} 
-      />
-      
-      {/* Main Layout */}
-      <div className="grid grid-cols-12 h-full">
-        {/* Left Panel - Narrative */}
-        <div className="col-span-3 border-r border-gray-800">
-          <NarrativePanel />
+    <div className="h-screen overflow-hidden">
+      {!isInitialized && <InitWizard onInitComplete={handleInitComplete} />}
+      <CalibrationDialog isOpen={showCalibration} onClose={() => setShowCalibration(false)} />
+
+      <div className="grid h-full grid-cols-12 gap-4 p-4">
+        <div className="col-span-3">
+          <Card className="h-full p-4">
+            <NarrativePanel />
+          </Card>
         </div>
-        
-        {/* Center - 3D Canvas */}
-        <div className="col-span-6 relative">
-          <BlueprintScene />
+
+        <div className="relative col-span-6">
+          {process.env.NEXT_PUBLIC_USE_NEW_3D === '0' ? (
+            <BlueprintScene />
+          ) : (
+            <EnergyPillar />
+          )}
+          <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 select-none">
+            <h1 className="text-center text-2xl font-bold">Dynamic Strategic Blueprint</h1>
+          </div>
         </div>
-        
-        {/* Right Panel - Action HUD */}
-        <div className="col-span-3 border-l border-gray-800">
-          <ActionHUD />
+
+        <div className="col-span-3">
+          <Card className="h-full p-4">
+            <ActionHUD />
+          </Card>
         </div>
       </div>
-      
-      {/* Info Card Overlay */}
+
       <InfoCard />
-      
-      {/* Title Overlay */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-        <h1 className="text-2xl font-bold text-white drop-shadow-lg">
-          Dynamic Strategic Blueprint
-        </h1>
-      </div>
-    </main>
+    </div>
   );
 }

@@ -1,7 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useBlueprintStore } from '@/lib/store/blueprintStore';
+import { useState } from "react";
+import { useBlueprintStore } from "@/lib/store/blueprintStore";
+import { Button } from "@/components/ui/button";
+import { isDemo, simulateCycle } from "@/lib/demo";
 
 export default function ActionHUD() {
   const [observations, setObservations] = useState('');
@@ -27,7 +29,7 @@ export default function ActionHUD() {
       return;
     }
     
-    if (!sessionId) {
+    if (!sessionId && !isDemo()) {
       setError('No active session');
       return;
     }
@@ -37,6 +39,18 @@ export default function ActionHUD() {
     setStreamingNarrative('');
     
     try {
+      if (isDemo()) {
+        const currentNarrative = useBlueprintStore.getState().narrative;
+        await simulateCycle(observations, (chunk, done) => {
+          setStreamingNarrative((prev) => (prev ? prev + chunk : chunk));
+          if (done) {
+            const updatedNarrative = currentNarrative ? currentNarrative + "\n" + chunk : chunk;
+            setNarrative(updatedNarrative);
+          }
+        });
+        setObservations('');
+        return;
+      }
       const response = await fetch('/api/cycle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -101,57 +115,57 @@ export default function ActionHUD() {
   };
   
   return (
-    <div className="h-full overflow-y-auto p-6 bg-gray-900 bg-opacity-50 backdrop-blur-sm">
-      <h2 className="text-xl font-bold mb-4 text-green-400">Action Center</h2>
+    <div className="h-full overflow-y-auto p-2">
+      <h2 className="mb-4 text-xl font-bold text-success">Action Center</h2>
       
       {selectedLine ? (
-        <div className="mb-6 p-4 bg-gray-800 rounded-lg border-l-4 border-green-500">
-          <h3 className="font-semibold text-lg mb-2">{selectedLine.label}</h3>
-          <p className="text-gray-300 text-sm">{selectedLine.content}</p>
+        <div className="mb-6 rounded border-l-4 border-success/70 bg-foreground/5 p-4">
+          <h3 className="mb-2 text-lg font-semibold">{selectedLine.label}</h3>
+          <p className="text-sm text-foreground/80">{selectedLine.content}</p>
         </div>
       ) : actionLines.length > 0 ? (
-        <div className="mb-6 p-4 bg-gray-800 rounded-lg">
-          <p className="text-gray-400">Click on an action line in the 3D view to see details</p>
+        <div className="mb-6 rounded bg-foreground/5 p-4">
+          <p className="text-foreground/70">Click on an action line in the 3D view to see details</p>
         </div>
       ) : null}
       
       {isLoading && streamingNarrative && (
-        <div className="mb-6 p-4 bg-blue-900 bg-opacity-30 border border-blue-500 rounded-lg">
-          <p className="text-sm text-blue-400 mb-2">AI is analyzing...</p>
-          <p className="text-white text-sm">{streamingNarrative}</p>
+        <div className="mb-6 rounded border border-primary/40 bg-foreground/5 p-4">
+          <p className="mb-2 text-sm text-foreground/70">AI is analyzing...</p>
+          <p className="text-sm">{streamingNarrative}</p>
         </div>
       )}
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-300">
+          <label className="mb-2 block text-sm font-medium text-foreground/80">
             Observations & Progress
           </label>
           <textarea
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
             placeholder="What did you observe after taking action? What worked? What didn't?"
-            className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:border-green-500 resize-none"
+            className="h-32 w-full resize-none rounded border border-white/10 bg-foreground/5 p-3 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-success/60"
             disabled={isLoading || !sessionId}
           />
         </div>
         
         {error && (
-          <p className="text-red-500 text-sm">{error}</p>
+          <p className="text-sm text-destructive">{error}</p>
         )}
         
-        <button
+        <Button
           onClick={handleCompleteCycle}
           disabled={isLoading || !sessionId || !observations.trim()}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          className="w-full"
         >
           {isLoading ? 'Processing...' : 'Complete Cycle'}
-        </button>
+        </Button>
       </div>
       
       {!sessionId && (
-        <div className="mt-4 p-4 bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded-lg">
-          <p className="text-yellow-400 text-sm">Please initialize a session first</p>
+        <div className="mt-4 rounded border border-warning/40 bg-foreground/5 p-4">
+          <p className="text-sm text-warning">Please initialize a session first</p>
         </div>
       )}
     </div>

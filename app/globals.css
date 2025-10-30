@@ -3,13 +3,111 @@
 @tailwind utilities;
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
+  /* Base Colors (Fixed Dark Theme) */
+  --background: 0 0% 7%;
+  --foreground: 0 0% 98%;
+  
+  /* Semantic Colors */
+  --primary: 211 100% 55%;           /* Bright blue - trust, clarity, action */
+  --primary-foreground: 0 0% 100%;
+  --accent: 38 92% 55%;              /* Gold - achievement, insight, warmth */
+  --accent-foreground: 0 0% 100%;
+  --success: 142 76% 42%;            /* Green - growth, strength */
+  --warning: 28 100% 55%;            /* Orange - opportunity, attention */
+  --destructive: 4 90% 63%;          /* Red - risk, critical info */
+  
+  /* UI Elements */
+  --card: 0 0% 12%;
+  --card-foreground: 0 0% 98%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 211 100% 55%;
+  
+  /* Glass Morphism */
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-strong-bg: rgba(30, 30, 30, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+  
+  /* Border Radius */
+  --radius: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  
+  /* Typography (Apple-Inspired) */
+  --font-apple-hero: 3rem;           /* 48px */
+  --font-apple-h1: 2.25rem;          /* 36px */
+  --font-apple-h2: 1.75rem;          /* 28px */
+  --font-apple-h3: 1.375rem;         /* 22px */
+  --font-apple-body: 1.0625rem;      /* 17px */
+  --font-apple-caption: 0.8125rem;   /* 13px */
+  
+  /* Animation Easing */
+  --ease-apple-spring: cubic-bezier(0.36, 0.66, 0.04, 1);
+  --ease-apple-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", 
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1 {
+    font-size: var(--font-apple-h1);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  
+  h2 {
+    font-size: var(--font-apple-h2);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  
+  h3 {
+    font-size: var(--font-apple-h3);
+    font-weight: 600;
+  }
 }
 
+@layer components {
+  /* Glass Morphism Utilities */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 0.5px solid var(--glass-border);
+  }
+  
+  .glass-strong {
+    background: var(--glass-strong-bg);
+    backdrop-filter: blur(24px);
+    border: 0.5px solid var(--glass-border);
+  }
+  
+  /* Shadow Utilities */
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  /* Smooth Transitions */
+  .transition-smooth {
+    transition-timing-function: var(--ease-apple-smooth);
+  }
+  
+  .transition-spring {
+    transition-timing-function: var(--ease-apple-spring);
+  }
+}

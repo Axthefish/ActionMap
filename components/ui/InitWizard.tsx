@@ -101,10 +101,12 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
   };
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-lg p-8 max-w-2xl w-full border border-gray-700">
-        <h2 className="text-3xl font-bold mb-4 text-white">Welcome to the Strategic Blueprint</h2>
-        <p className="text-gray-300 mb-6">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+      <div className="glass-strong rounded-xl p-8 max-w-2xl w-full shadow-lg">
+        <h2 className="text-apple-hero font-bold mb-4 text-foreground">
+          Welcome to the Strategic Blueprint
+        </h2>
+        <p className="text-foreground/80 text-apple-body mb-6 leading-relaxed">
           Let's start by understanding your journey. Describe your goal or the challenge you're working on.
           The AI will generate a strategic blueprint tailored to your situation.
         </p>
@@ -115,30 +117,34 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
               value={userGoal}
               onChange={(e) => setUserGoal(e.target.value)}
               placeholder="Example: I want to build a SaaS product and grow it to $10k MRR..."
-              className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-4 focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full h-32 glass text-foreground border border-border/30 rounded-lg p-4 
+                       focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 
+                       resize-none placeholder:text-foreground/40 transition-all"
               disabled={isLoading}
               autoFocus
             />
-            <div className="text-xs text-gray-500 mt-1 text-right">
+            <div className="text-apple-caption text-foreground/50 mt-1 text-right">
               {userGoal.length} characters
             </div>
           </div>
           
           {error && (
-            <p className="text-red-500 mb-4">{error}</p>
+            <p className="text-destructive mb-4 font-medium">{error}</p>
           )}
           
           {isLoading && streamingNarrative && (
-            <div className="mb-4 p-4 bg-gray-800 rounded-lg border border-blue-500">
-              <p className="text-sm text-gray-400 mb-2">AI is generating your blueprint...</p>
-              <p className="text-white text-sm">{streamingNarrative}</p>
+            <div className="mb-4 p-4 glass rounded-lg border border-primary/50 shadow-md">
+              <p className="text-sm text-primary/80 mb-2 font-medium">AI is generating your blueprint...</p>
+              <p className="text-foreground text-sm">{streamingNarrative}</p>
             </div>
           )}
           
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            className="w-full bg-primary hover:bg-primary/90 disabled:bg-border text-white 
+                     font-semibold py-3 px-6 rounded-lg transition-all duration-200 
+                     hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Generating Blueprint...' : 'Generate My Blueprint'}
           </button>
