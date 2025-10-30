@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useBlueprintStore } from '@/lib/store/blueprintStore';
+import { Button } from './Button';
 
 export default function ActionHUD() {
   const [observations, setObservations] = useState('');
@@ -101,57 +102,62 @@ export default function ActionHUD() {
   };
   
   return (
-    <div className="h-full overflow-y-auto p-6 bg-gray-900 bg-opacity-50 backdrop-blur-sm">
-      <h2 className="text-xl font-bold mb-4 text-green-400">Action Center</h2>
+    <div className="h-full overflow-y-auto p-6 glass-strong border-l border-border/20">
+      <h2 className="text-apple-h2 font-semibold mb-4 text-success">
+        Action Center
+      </h2>
       
       {selectedLine ? (
-        <div className="mb-6 p-4 bg-gray-800 rounded-lg border-l-4 border-green-500">
-          <h3 className="font-semibold text-lg mb-2">{selectedLine.label}</h3>
-          <p className="text-gray-300 text-sm">{selectedLine.content}</p>
+        <div className="mb-6 p-4 glass rounded-lg border-l-4 border-accent shadow-card">
+          <h3 className="font-semibold text-apple-h3 mb-2 text-accent">{selectedLine.label}</h3>
+          <p className="text-foreground/80 text-sm">{selectedLine.content}</p>
         </div>
       ) : actionLines.length > 0 ? (
-        <div className="mb-6 p-4 bg-gray-800 rounded-lg">
-          <p className="text-gray-400">Click on an action line in the 3D view to see details</p>
+        <div className="mb-6 p-4 glass rounded-lg">
+          <p className="text-foreground/60 text-sm">Click on an action line in the 3D view to see details</p>
         </div>
       ) : null}
       
       {isLoading && streamingNarrative && (
-        <div className="mb-6 p-4 bg-blue-900 bg-opacity-30 border border-blue-500 rounded-lg">
-          <p className="text-sm text-blue-400 mb-2">AI is analyzing...</p>
-          <p className="text-white text-sm">{streamingNarrative}</p>
+        <div className="mb-6 p-4 glass rounded-lg border border-primary/50 shadow-md">
+          <p className="text-sm text-primary mb-2 font-medium">AI is analyzing...</p>
+          <p className="text-foreground text-sm">{streamingNarrative}</p>
         </div>
       )}
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-300">
+          <label className="block text-sm font-medium mb-2 text-foreground/70">
             Observations & Progress
           </label>
           <textarea
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
             placeholder="What did you observe after taking action? What worked? What didn't?"
-            className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:border-green-500 resize-none"
+            className="w-full h-32 glass text-foreground border border-border/30 rounded-lg p-3 
+                     focus:outline-none focus:border-success/50 focus:ring-2 focus:ring-success/20 
+                     resize-none placeholder:text-foreground/40 transition-all"
             disabled={isLoading || !sessionId}
           />
         </div>
         
         {error && (
-          <p className="text-red-500 text-sm">{error}</p>
+          <p className="text-destructive text-sm font-medium">{error}</p>
         )}
         
-        <button
+        <Button
           onClick={handleCompleteCycle}
           disabled={isLoading || !sessionId || !observations.trim()}
-          className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+          className="w-full bg-success hover:bg-success/90 text-white font-semibold"
+          size="lg"
         >
           {isLoading ? 'Processing...' : 'Complete Cycle'}
-        </button>
+        </Button>
       </div>
       
       {!sessionId && (
-        <div className="mt-4 p-4 bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded-lg">
-          <p className="text-yellow-400 text-sm">Please initialize a session first</p>
+        <div className="mt-4 p-4 glass rounded-lg border border-warning/50">
+          <p className="text-warning text-sm">Please initialize a session first</p>
         </div>
       )}
     </div>

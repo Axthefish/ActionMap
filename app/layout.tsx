@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import StarryBackground from "@/components/StarryBackground";
 
 export const metadata: Metadata = {
-  title: "Dynamic Strategic Blueprint",
-  description: "AI-powered 3D strategic navigation tool",
+  title: "Dynamic Strategic Blueprint - AI-Powered Strategic Navigation",
+  description: "Transform your goals into actionable strategies with AI-powered 3D blueprint visualization",
 };
 
 export default function RootLayout({
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <StarryBackground />
         {children}
       </body>
     </html>

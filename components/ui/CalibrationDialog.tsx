@@ -105,10 +105,10 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
   };
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-lg p-8 max-w-2xl w-full border border-gray-700">
-        <h2 className="text-2xl font-bold mb-4 text-white">Calibrate Your Position</h2>
-        <p className="text-gray-300 mb-6">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+      <div className="glass-strong rounded-xl p-8 max-w-2xl w-full shadow-lg">
+        <h2 className="text-apple-h1 font-bold mb-4 text-foreground">Calibrate Your Position</h2>
+        <p className="text-foreground/80 text-apple-body mb-6 leading-relaxed">
           The AI has placed you at an initial position on the blueprint. 
           Does this feel accurate? If not, tell us where you actually are.
         </p>
@@ -118,18 +118,20 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder="Example: Actually, I'm further along. I already have 5 paying customers..."
-            className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-4 mb-4 focus:outline-none focus:border-blue-500 resize-none"
+            className="w-full h-32 glass text-foreground border border-border/30 rounded-lg p-4 mb-4 
+                     focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 
+                     resize-none placeholder:text-foreground/40 transition-all"
             disabled={isLoading}
           />
           
           {error && (
-            <p className="text-red-500 mb-4">{error}</p>
+            <p className="text-destructive mb-4 font-medium">{error}</p>
           )}
           
           {isLoading && streamingNarrative && (
-            <div className="mb-4 p-4 bg-gray-800 rounded-lg border border-blue-500">
-              <p className="text-sm text-gray-400 mb-2">AI is calibrating...</p>
-              <p className="text-white text-sm">{streamingNarrative}</p>
+            <div className="mb-4 p-4 glass rounded-lg border border-primary/50 shadow-md">
+              <p className="text-sm text-primary/80 mb-2 font-medium">AI is calibrating...</p>
+              <p className="text-foreground text-sm">{streamingNarrative}</p>
             </div>
           )}
           
@@ -138,14 +140,18 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
               type="button"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="flex-1 glass hover:bg-foreground/10 disabled:opacity-50 text-foreground 
+                       font-semibold py-3 px-6 rounded-lg transition-all duration-200 
+                       active:scale-95 disabled:cursor-not-allowed"
             >
               Skip
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              className="flex-1 bg-primary hover:bg-primary/90 disabled:bg-border text-white 
+                       font-semibold py-3 px-6 rounded-lg transition-all duration-200 
+                       hover:shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Calibrating...' : 'Calibrate Position'}
             </button>

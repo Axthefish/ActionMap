@@ -28,7 +28,7 @@ export default function Home() {
   };
   
   return (
-    <main className="h-screen w-screen overflow-hidden bg-black text-white">
+    <main className="h-screen w-screen overflow-hidden bg-background text-foreground">
       {/* Init Wizard Modal */}
       {!isInitialized && (
         <InitWizard onInitComplete={handleInitComplete} />
@@ -43,7 +43,7 @@ export default function Home() {
       {/* Main Layout */}
       <div className="grid grid-cols-12 h-full">
         {/* Left Panel - Narrative */}
-        <div className="col-span-3 border-r border-gray-800">
+        <div className="col-span-3">
           <NarrativePanel />
         </div>
         
@@ -53,7 +53,7 @@ export default function Home() {
         </div>
         
         {/* Right Panel - Action HUD */}
-        <div className="col-span-3 border-l border-gray-800">
+        <div className="col-span-3">
           <ActionHUD />
         </div>
       </div>
@@ -61,9 +61,9 @@ export default function Home() {
       {/* Info Card Overlay */}
       <InfoCard />
       
-      {/* Title Overlay */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-        <h1 className="text-2xl font-bold text-white drop-shadow-lg">
+      {/* Title Overlay with glass morphism */}
+      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 glass px-6 py-3 rounded-xl shadow-lg">
+        <h1 className="text-apple-h2 font-bold text-foreground tracking-tight">
           Dynamic Strategic Blueprint
         </h1>
       </div>
