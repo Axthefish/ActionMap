@@ -21,18 +21,6 @@ const BlueprintScene = dynamic(() => import("@/components/3d/BlueprintScene"), {
   ),
 });
 
-const EnergyPillar = dynamic(
-  () => import("@/components/3d/EnergyPillarSystemPro"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-foreground/70">Loading 3D Scene...</div>
-      </div>
-    ),
-  }
-);
-
 export default function Home() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [showCalibration, setShowCalibration] = useState(false);
@@ -63,11 +51,7 @@ export default function Home() {
         </div>
 
         <div className="relative col-span-6">
-          {process.env.NEXT_PUBLIC_USE_NEW_3D === '0' ? (
-            <BlueprintScene />
-          ) : (
-            <EnergyPillar />
-          )}
+          <BlueprintScene />
           <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 select-none">
             <h1 className="text-center text-2xl font-bold">Dynamic Strategic Blueprint</h1>
           </div>
