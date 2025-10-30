@@ -1,15 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import InitWizard from "@/components/ui/InitWizard";
-import CalibrationDialog from "@/components/ui/CalibrationDialog";
-import NarrativePanel from "@/components/ui/NarrativePanel";
-import ActionHUD from "@/components/ui/ActionHUD";
-import InfoCard from "@/components/ui/InfoCard";
-import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
 import { applyDemoSeed, isDemo } from "@/lib/demo";
+import { useBlueprintStore } from "@/lib/store/blueprintStore";
 
 // Dynamically import 3D scene to avoid SSR issues
 const BlueprintScene = dynamic(() => import("@/components/3d/BlueprintScene"), {
@@ -21,50 +15,39 @@ const BlueprintScene = dynamic(() => import("@/components/3d/BlueprintScene"), {
   ),
 });
 
+// Import UI components
+const WelcomePage = dynamic(() => import("@/components/ui/WelcomePage"), { ssr: false });
+const GoalInputPage = dynamic(() => import("@/components/ui/GoalInputPage"), { ssr: false });
+const MainDashboard = dynamic(() => import("@/components/ui/MainDashboard"), { ssr: false });
+
+type AppStage = 'welcome' | 'input' | 'dashboard';
+
 export default function Home() {
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [showCalibration, setShowCalibration] = useState(false);
-  
-  const handleInitComplete = () => {
-    setIsInitialized(true);
-    setShowCalibration(true);
-  };
+  const [stage, setStage] = useState<AppStage>('welcome');
+  const blueprintDefinition = useBlueprintStore(state => state.blueprintDefinition);
   
   useEffect(() => {
     if (isDemo()) {
       applyDemoSeed();
-      setIsInitialized(true);
-      setShowCalibration(false);
+      setStage('dashboard');
     }
   }, []);
   
-  return (
-    <div className="h-screen overflow-hidden">
-      {!isInitialized && <InitWizard onInitComplete={handleInitComplete} />}
-      <CalibrationDialog isOpen={showCalibration} onClose={() => setShowCalibration(false)} />
-
-      <div className="grid h-full grid-cols-12 gap-4 p-4">
-        <div className="col-span-3">
-          <Card className="h-full p-4">
-            <NarrativePanel />
-          </Card>
-        </div>
-
-        <div className="relative col-span-6">
-          <BlueprintScene />
-          <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 select-none">
-            <h1 className="text-center text-2xl font-bold">Dynamic Strategic Blueprint</h1>
-          </div>
-        </div>
-
-        <div className="col-span-3">
-          <Card className="h-full p-4">
-            <ActionHUD />
-          </Card>
-        </div>
-      </div>
-
-      <InfoCard />
-    </div>
-  );
+  // Auto-progress to dashboard when blueprint is ready
+  useEffect(() => {
+    if (blueprintDefinition && stage === 'input') {
+      // Small delay to show success state
+      setTimeout(() => setStage('dashboard'), 800);
+    }
+  }, [blueprintDefinition, stage]);
+  
+  if (stage === 'welcome') {
+    return <WelcomePage onStartNewGoal={() => setStage('input')} />;
+  }
+  
+  if (stage === 'input') {
+    return <GoalInputPage />;
+  }
+  
+  return <MainDashboard />;
 }

@@ -76,15 +76,14 @@ export async function simulateCalibration(feedback: string, onStream?: (chunk: s
   const s = useBlueprintStore.getState();
   const chunks = [
     "Analyzing your feedback... ",
-    "Adjusting position slightly to reflect early traction... ",
-    "Focusing next cycle on must-have validation."
+    "Understanding your current position... ",
+    "Calibration complete."
   ];
   for (let i = 0; i < chunks.length; i++) {
     await new Promise((r) => setTimeout(r, 400));
     onStream?.(chunks[i], i === chunks.length - 1);
   }
-  const newPos = Math.min(1, (s.currentPosition || 0.18) + 0.07);
-  s.updatePosition(newPos);
+  // Don't auto-update position - only update based on actual feedback
   s.setActionLines([
     ...s.actionLines,
     {
@@ -108,8 +107,8 @@ export async function simulateCycle(observations: string, onStream?: (chunk: str
     await new Promise((r) => setTimeout(r, 400));
     onStream?.(chunks[i], i === chunks.length - 1);
   }
-  const newPos = Math.min(1, (s.currentPosition || 0.18) + 0.05);
-  s.updatePosition(newPos);
+  // Only update position if observations indicate actual progress
+  // For now, don't auto-increment to avoid unwanted movement
   s.setActionLines([
     ...s.actionLines,
     {
