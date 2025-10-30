@@ -12,19 +12,23 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg" />
+          {/* Blueprint Icon - SVG design representing strategic planning */}
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="24" height="24" rx="4" stroke="url(#gradient1)" strokeWidth="2" fill="none"/>
+            <circle cx="8" cy="16" r="2" fill="url(#gradient1)"/>
+            <circle cx="16" cy="12" r="2" fill="url(#gradient1)"/>
+            <circle cx="24" cy="16" r="2" fill="url(#gradient1)"/>
+            <line x1="10" y1="16" x2="14" y2="13" stroke="url(#gradient1)" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="18" y1="13" x2="22" y2="16" stroke="url(#gradient1)" strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M16 14 L16 20 L20 24" stroke="url(#gradient1)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            <defs>
+              <linearGradient id="gradient1" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#00d4ff"/>
+                <stop offset="100%" stopColor="#10b981"/>
+              </linearGradient>
+            </defs>
+          </svg>
           <span className="text-2xl font-bold text-foreground">Dynamic Blueprint</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-foreground/70 hover:text-foreground transition">
-            <span className="text-lg">⚙️</span>
-          </button>
-          <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-foreground/70 hover:text-foreground transition">
-            <span className="text-lg">❓</span>
-          </button>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-foreground font-semibold">
-            U
-          </div>
         </div>
       </header>
 

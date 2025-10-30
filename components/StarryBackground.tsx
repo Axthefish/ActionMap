@@ -67,15 +67,15 @@ export default function StarryBackground() {
       
       // Far stars (smallest, slowest, dimmest)
       for (let i = 0; i < starCounts.far; i++) {
-        const baseOpacity = Math.random() * 0.2 + 0.1;
+        const baseOpacity = Math.random() * 0.3 + 0.2;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 1,
-          size: Math.random() * 0.8 + 0.3,
+          size: Math.random() * 1.0 + 0.5, // Increased size
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 0.5 + 0.3,
+          twinkleSpeed: Math.random() * 0.8 + 0.4, // Faster twinkle
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
         });
@@ -83,15 +83,15 @@ export default function StarryBackground() {
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {
-        const baseOpacity = Math.random() * 0.35 + 0.25;
+        const baseOpacity = Math.random() * 0.4 + 0.35;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 2,
-          size: Math.random() * 1.2 + 0.6,
+          size: Math.random() * 1.6 + 0.9, // Increased size
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 0.8 + 0.4,
+          twinkleSpeed: Math.random() * 1.0 + 0.5, // Faster twinkle
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
         });
@@ -99,15 +99,15 @@ export default function StarryBackground() {
       
       // Near stars (largest, fastest, brightest) - fewer of these
       for (let i = 0; i < starCounts.near; i++) {
-        const baseOpacity = Math.random() * 0.4 + 0.4;
+        const baseOpacity = Math.random() * 0.5 + 0.5;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 3,
-          size: Math.random() * 1.5 + 0.9,
+          size: Math.random() * 2.0 + 1.2, // Increased size
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 1.2 + 0.6,
+          twinkleSpeed: Math.random() * 1.5 + 0.8, // Faster twinkle
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
         });
@@ -136,9 +136,9 @@ export default function StarryBackground() {
       ctx.fillStyle = 'hsl(0, 0%, 7%)'; // Match background color
       ctx.fillRect(0, 0, width, height);
       
-      // Update rotation (parallax effect)
+      // Update rotation (parallax effect) - increased speed for visibility
       if (config.enableStarRotation) {
-        rotationRef.current += 0.0001 * config.animationSpeed;
+        rotationRef.current += 0.001 * config.animationSpeed; // 10x faster for noticeable rotation
       }
       
       // Draw stars with twinkling effect
@@ -157,7 +157,7 @@ export default function StarryBackground() {
           const angle = Math.atan2(dy, dx);
           const distance = Math.sqrt(dx * dx + dy * dy);
           // Stars rotate around user (center) - further stars rotate slower (parallax)
-          const rotationSpeed = rotationRef.current * (1 / star.z) * 0.5;
+          const rotationSpeed = rotationRef.current * (1 / star.z) * 2.0; // Increased for more noticeable movement
           
           x = centerX + Math.cos(angle + rotationSpeed) * distance;
           y = centerY + Math.sin(angle + rotationSpeed) * distance;
@@ -202,18 +202,32 @@ export default function StarryBackground() {
         ctx.arc(x, y, star.size, 0, Math.PI * 2);
         ctx.fill();
         
-        // Add subtle cross-flare for brighter stars
-        if (star.size > 1 && currentOpacity > 0.5) {
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.3})`;
-          ctx.lineWidth = 0.5;
+        // Add cross-flare for brighter stars (more visible, like real stars)
+        if (star.size > 0.8 && currentOpacity > 0.4) {
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.5})`;
+          ctx.lineWidth = 0.8;
+          ctx.lineCap = 'round';
           ctx.beginPath();
           // Vertical line
-          ctx.moveTo(x, y - star.size * 1.5);
-          ctx.lineTo(x, y + star.size * 1.5);
+          ctx.moveTo(x, y - star.size * 2.5);
+          ctx.lineTo(x, y + star.size * 2.5);
           // Horizontal line
-          ctx.moveTo(x - star.size * 1.5, y);
-          ctx.lineTo(x + star.size * 1.5, y);
+          ctx.moveTo(x - star.size * 2.5, y);
+          ctx.lineTo(x + star.size * 2.5, y);
           ctx.stroke();
+          
+          // Add diagonal flares for brighter stars
+          if (star.size > 1.5) {
+            ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.3})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            // Diagonal lines
+            ctx.moveTo(x - star.size * 1.5, y - star.size * 1.5);
+            ctx.lineTo(x + star.size * 1.5, y + star.size * 1.5);
+            ctx.moveTo(x + star.size * 1.5, y - star.size * 1.5);
+            ctx.lineTo(x - star.size * 1.5, y + star.size * 1.5);
+            ctx.stroke();
+          }
         }
       });
       

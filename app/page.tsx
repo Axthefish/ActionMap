@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import CalibrationDialog from "@/components/ui/CalibrationDialog";
 import NarrativePanel from "@/components/ui/NarrativePanel";
-import ActionHUD from "@/components/ui/ActionHUD";
+import RoadmapPanel from "@/components/ui/RoadmapPanel";
 import InfoCard from "@/components/ui/InfoCard";
 import { Card } from "@/components/ui/card";
 
@@ -61,11 +61,11 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="col-span-3">
-          <Card className="h-full p-4">
-            <ActionHUD />
-          </Card>
-        </div>
+            <div className="col-span-3">
+              <Card className="h-full p-4">
+                <RoadmapPanel />
+              </Card>
+            </div>
       </div>
 
       <InfoCard />
