@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { isDemo, simulateCalibration } from "@/lib/demo";
 
 interface CalibrationDialogProps {
   isOpen: boolean;
@@ -34,7 +33,7 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
       return;
     }
     
-    if (!sessionId && !isDemo()) {
+    if (!sessionId) {
       setError("No active session");
       return;
     }
@@ -44,19 +43,6 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
     setStreamingNarrative("");
     
     try {
-      if (isDemo()) {
-        const currentNarrative = useBlueprintStore.getState().narrative;
-        await simulateCalibration(feedback, (chunk, done) => {
-          setStreamingNarrative((prev) => (prev ? prev + chunk : chunk));
-          if (done) {
-            const updatedNarrative = currentNarrative ? currentNarrative + "\n" + chunk : chunk;
-            setNarrative(updatedNarrative);
-          }
-        });
-        onClose();
-        setFeedback("");
-        return;
-      }
       const response = await fetch("/api/calibrate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

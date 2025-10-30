@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
-import { applyDemoSeed, isDemo } from "@/lib/demo";
 import CalibrationDialog from "@/components/ui/CalibrationDialog";
 import NarrativePanel from "@/components/ui/NarrativePanel";
 import ActionHUD from "@/components/ui/ActionHUD";
@@ -32,14 +31,6 @@ export default function Home() {
   const handleInitComplete = () => {
     setShowCalibration(true);
   };
-  
-  useEffect(() => {
-    if (isDemo()) {
-      applyDemoSeed();
-      setStage('dashboard');
-      setShowCalibration(false);
-    }
-  }, []);
   
   // Show welcome page
   if (stage === 'welcome') {

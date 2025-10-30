@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 import { Button } from "@/components/ui/button";
-import { isDemo, simulateCycle } from "@/lib/demo";
 
 export default function ActionHUD() {
   const [observations, setObservations] = useState('');
@@ -29,7 +28,7 @@ export default function ActionHUD() {
       return;
     }
     
-    if (!sessionId && !isDemo()) {
+    if (!sessionId) {
       setError('No active session');
       return;
     }
@@ -39,18 +38,6 @@ export default function ActionHUD() {
     setStreamingNarrative('');
     
     try {
-      if (isDemo()) {
-        const currentNarrative = useBlueprintStore.getState().narrative;
-        await simulateCycle(observations, (chunk, done) => {
-          setStreamingNarrative((prev) => (prev ? prev + chunk : chunk));
-          if (done) {
-            const updatedNarrative = currentNarrative ? currentNarrative + "\n" + chunk : chunk;
-            setNarrative(updatedNarrative);
-          }
-        });
-        setObservations('');
-        return;
-      }
       const response = await fetch('/api/cycle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

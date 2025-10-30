@@ -11,12 +11,9 @@ import { detectPerformanceTier, getPerformanceConfig } from '@/lib/performance';
 import * as THREE from 'three';
 
 export default function BlueprintScene() {
-  // Support mock data from window
-  const mockStore = typeof window !== 'undefined' ? (window as any).__mockStore : null;
-  
-  const blueprintDefinition = mockStore?.blueprintDefinition || useBlueprintStore((state) => state.blueprintDefinition);
-  const currentPosition = mockStore?.currentPosition ?? useBlueprintStore((state) => state.currentPosition);
-  const actionLines = mockStore?.actionLines || useBlueprintStore((state) => state.actionLines);
+  const blueprintDefinition = useBlueprintStore((state) => state.blueprintDefinition);
+  const currentPosition = useBlueprintStore((state) => state.currentPosition);
+  const actionLines = useBlueprintStore((state) => state.actionLines);
   
   return (
     <Canvas
