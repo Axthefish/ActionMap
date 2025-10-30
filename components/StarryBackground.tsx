@@ -156,11 +156,17 @@ export default function StarryBackground() {
           const dy = star.y - centerY;
           const angle = Math.atan2(dy, dx);
           const distance = Math.sqrt(dx * dx + dy * dy);
-          // Stars rotate around user (center) - further stars rotate slower (parallax)
-          const rotationSpeed = rotationRef.current * (1 / star.z) * 2.0; // Increased for more noticeable movement
+          // Stars rotate diagonally around user (center) - parallax effect
+          const rotationSpeed = rotationRef.current * (1 / star.z) * 2.0;
           
+          // Diagonal rotation: rotate both around center and add diagonal drift
           x = centerX + Math.cos(angle + rotationSpeed) * distance;
           y = centerY + Math.sin(angle + rotationSpeed) * distance;
+          
+          // Add diagonal movement component
+          const diagonalOffset = rotationRef.current * (1 / star.z) * 50;
+          x += diagonalOffset;
+          y += diagonalOffset;
           
           // Wrap around edges
           if (x < 0) x += width;

@@ -81,13 +81,51 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
           {/* Right Column - Visual */}
           <div className="flex items-center justify-center">
             <div className="relative w-full aspect-square max-w-xl glass-strong rounded-3xl p-12 border border-white/10 overflow-hidden">
-              {/* Gradient Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/20 to-success/20 opacity-50" />
-              
-              {/* 3D Shape Placeholder */}
-              <div className="relative w-full h-full flex items-center justify-center">
-                <div className="w-64 h-64 rounded-[4rem] bg-gradient-to-br from-primary to-accent opacity-80 transform rotate-45 shadow-2xl" />
-              </div>
+              {/* Abstract network visualization */}
+              <svg className="w-full h-full" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Connection lines */}
+                <path d="M100 100 L200 150 L300 100" stroke="url(#lineGrad1)" strokeWidth="2" opacity="0.4" />
+                <path d="M200 150 L200 250" stroke="url(#lineGrad1)" strokeWidth="2" opacity="0.4" />
+                <path d="M100 100 L100 250" stroke="url(#lineGrad2)" strokeWidth="2" opacity="0.3" />
+                <path d="M300 100 L300 250" stroke="url(#lineGrad2)" strokeWidth="2" opacity="0.3" />
+                <path d="M100 250 L200 300 L300 250" stroke="url(#lineGrad1)" strokeWidth="2" opacity="0.4" />
+                
+                {/* Nodes */}
+                <circle cx="100" cy="100" r="8" fill="url(#nodeGrad1)" opacity="0.9" />
+                <circle cx="200" cy="150" r="12" fill="url(#nodeGrad2)" opacity="0.9" />
+                <circle cx="300" cy="100" r="8" fill="url(#nodeGrad1)" opacity="0.9" />
+                <circle cx="100" cy="250" r="8" fill="url(#nodeGrad3)" opacity="0.9" />
+                <circle cx="200" cy="300" r="10" fill="url(#nodeGrad3)" opacity="0.9" />
+                <circle cx="300" cy="250" r="8" fill="url(#nodeGrad3)" opacity="0.9" />
+                
+                {/* Glows */}
+                <circle cx="200" cy="150" r="20" fill="url(#nodeGrad2)" opacity="0.2" />
+                <circle cx="200" cy="300" r="18" fill="url(#nodeGrad3)" opacity="0.2" />
+                
+                {/* Gradients */}
+                <defs>
+                  <linearGradient id="lineGrad1" x1="0" y1="0" x2="400" y2="400">
+                    <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.8"/>
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.8"/>
+                  </linearGradient>
+                  <linearGradient id="lineGrad2" x1="0" y1="0" x2="0" y2="400">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.6"/>
+                    <stop offset="100%" stopColor="#00d4ff" stopOpacity="0.6"/>
+                  </linearGradient>
+                  <radialGradient id="nodeGrad1">
+                    <stop offset="0%" stopColor="#00d4ff"/>
+                    <stop offset="100%" stopColor="#3b82f6"/>
+                  </radialGradient>
+                  <radialGradient id="nodeGrad2">
+                    <stop offset="0%" stopColor="#10b981"/>
+                    <stop offset="100%" stopColor="#00d4ff"/>
+                  </radialGradient>
+                  <radialGradient id="nodeGrad3">
+                    <stop offset="0%" stopColor="#10b981"/>
+                    <stop offset="100%" stopColor="#059669"/>
+                  </radialGradient>
+                </defs>
+              </svg>
             </div>
           </div>
         </div>

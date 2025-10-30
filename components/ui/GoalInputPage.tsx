@@ -2,15 +2,20 @@
 
 import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
+import { Loader2 } from "lucide-react";
 
 interface GoalInputPageProps {
   onComplete: () => void;
 }
 
+type FlowStage = 'input' | 'loading' | 'streaming' | 'transitioning';
+
 export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
   const [userGoal, setUserGoal] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [flowStage, setFlowStage] = useState<FlowStage>('input');
   const [error, setError] = useState<string | null>(null);
+  const [streamingNarrative, setStreamingNarrative] = useState("");
+  const [showTransition, setShowTransition] = useState(false);
 
   const {
     setSessionId,
@@ -30,11 +35,13 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
       return;
     }
 
-    setIsLoading(true);
+    setFlowStage('loading');
     setError(null);
 
-    // Immediately transition to dashboard
-    onComplete();
+    // Simulate initial loading delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    setFlowStage('streaming');
 
     try {
       const response = await fetch("/api/init", {
@@ -82,11 +89,15 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
                 ?.initial_action_lines || [];
               setActionLines(initialActionLines);
             } else if (data.type === "narrative") {
+              setStreamingNarrative(data.text);
               if (data.isComplete) {
                 setNarrative(data.text);
               }
             } else if (data.type === "done") {
-              // Already transitioned to dashboard
+              // Start transition animation
+              setFlowStage('transitioning');
+              await new Promise(resolve => setTimeout(resolve, 1500));
+              onComplete();
             } else if (data.type === "error") {
               throw new Error(data.message);
             }
@@ -95,8 +106,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(false);
+      setFlowStage('input');
     }
   };
 
@@ -126,49 +136,91 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
       </header>
 
       {/* Main Content */}
-      <div className="max-w-4xl w-full px-8">
-        <div className="space-y-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold text-foreground">
-              What's Your Ambition?
-            </h1>
-            <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
-              Describe your aspiration in your own words. The more detail, the
-              better our AI can help you.
-            </p>
+      <div className="w-full h-full flex items-center justify-center px-8">
+        {/* Stage 1: Input */}
+        {flowStage === 'input' && (
+          <div className="max-w-4xl w-full space-y-8 animate-in fade-in duration-500">
+            <div className="text-center space-y-4">
+              <h1 className="text-5xl font-bold text-foreground">
+                What's Your Ambition?
+              </h1>
+              <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
+                Describe your aspiration in your own words. The more detail, the
+                better our AI can help you.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="relative">
+                <textarea
+                  value={userGoal}
+                  onChange={(e) => setUserGoal(e.target.value)}
+                  placeholder="e.g., 'I want to become a better public speaker to advance in my career' or 'I feel stuck and want to find a more fulfilling professional path.'"
+                  className="w-full h-48 glass-strong text-foreground border border-white/20 rounded-2xl p-6 text-lg
+                           focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20
+                           resize-none placeholder:text-foreground/40 transition-all"
+                  autoFocus
+                />
+              </div>
+
+              {error && (
+                <p className="text-destructive text-center font-medium">{error}</p>
+              )}
+
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={!userGoal.trim()}
+                  className="px-12 py-4 bg-primary hover:bg-primary/90 disabled:bg-border text-white
+                           font-semibold text-lg rounded-xl transition-all duration-200
+                           hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  Analyze My Goal
+                </button>
+              </div>
+            </form>
           </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Stage 2: Loading */}
+        {flowStage === 'loading' && (
+          <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
             <div className="relative">
-              <textarea
-                value={userGoal}
-                onChange={(e) => setUserGoal(e.target.value)}
-                placeholder="e.g., 'I want to become a better public speaker to advance in my career' or 'I feel stuck and want to find a more fulfilling professional path.'"
-                className="w-full h-48 glass-strong text-foreground border border-white/20 rounded-2xl p-6 text-lg
-                         focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20
-                         resize-none placeholder:text-foreground/40 transition-all"
-                disabled={isLoading}
-                autoFocus
-              />
+              <Loader2 className="w-16 h-16 text-primary animate-spin" />
+              <div className="absolute inset-0 w-16 h-16 rounded-full bg-primary/20 blur-xl animate-pulse" />
             </div>
-
-            {error && (
-              <p className="text-destructive text-center font-medium">{error}</p>
-            )}
-
-            <div className="flex justify-center">
-              <button
-                type="submit"
-                disabled={isLoading || !userGoal.trim()}
-                className="px-12 py-4 bg-primary hover:bg-primary/90 disabled:bg-border text-white
-                         font-semibold text-lg rounded-xl transition-all duration-200
-                         hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-              >
-                {isLoading ? "Analyzing..." : "Analyze My Goal"}
-              </button>
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-semibold text-foreground">Analyzing Your Ambition</h2>
+              <p className="text-foreground/60">Crafting your strategic blueprint...</p>
             </div>
-          </form>
-        </div>
+          </div>
+        )}
+
+        {/* Stage 3: Streaming Narrative (Centered) */}
+        {flowStage === 'streaming' && (
+          <div className={`max-w-3xl w-full transition-all duration-1000 ${showTransition ? 'translate-x-[-40%] scale-90' : ''}`}>
+            <div className="glass-strong rounded-2xl p-8 border border-primary/30 animate-in fade-in duration-500">
+              <h2 className="text-2xl font-semibold text-primary mb-4">Strategic Briefing</h2>
+              <div className="prose prose-invert max-w-none">
+                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {streamingNarrative}
+                  <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1 rounded-sm"></span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Stage 4: Transitioning */}
+        {flowStage === 'transitioning' && (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="text-center space-y-6 animate-in fade-in duration-500">
+              <div className="text-6xl mb-4">✓</div>
+              <h1 className="text-4xl font-bold text-success">Blueprint Ready!</h1>
+              <p className="text-xl text-foreground/70">Preparing your visualization...</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
