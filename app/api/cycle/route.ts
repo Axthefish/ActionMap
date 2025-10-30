@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
             assessmentNarrative: narrative,
             previousPosition: previousPosition,
             newPosition: new_arrow_position,
-            actionLines: new_action_lines_to_draw,
+            actionLines: new_action_lines_to_draw as any,
           });
           
           console.log('[API /cycle] Cycle completed successfully, new position:', new_arrow_position);

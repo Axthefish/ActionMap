@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
           // Save to database
           await db.insert(sessions).values({
             id: sessionId,
+            userId: null,
             currentPosition: initial_hypothesis.suggested_position_on_path,
             activeCycleIndex: 0,
             lastAssessmentNarrative: null,
@@ -47,9 +48,9 @@ export async function POST(req: NextRequest) {
           await db.insert(blueprints).values({
             id: blueprintId,
             sessionId: sessionId,
-            mainPath: blueprint_definition.main_path,
-            milestoneNodes: blueprint_definition.milestone_nodes,
-            initialHypothesis: initial_hypothesis,
+            mainPath: blueprint_definition.main_path as any,
+            milestoneNodes: blueprint_definition.milestone_nodes as any,
+            initialHypothesis: initial_hypothesis as any,
           });
           
           console.log('[API /init] Blueprint created successfully, session:', sessionId);
