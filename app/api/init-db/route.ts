@@ -1,11 +1,10 @@
 import { NextRequest } from 'next/server';
-import { db } from '@/lib/db';
-import { sql } from 'drizzle-orm';
+import { sql } from '@vercel/postgres';
 
 export async function GET(req: NextRequest) {
   try {
     // Create sessions table
-    await db.execute(sql`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS sessions (
         id TEXT PRIMARY KEY,
         user_id TEXT,
@@ -19,7 +18,7 @@ export async function GET(req: NextRequest) {
     `);
 
     // Create blueprints table
-    await db.execute(sql`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS blueprints (
         id TEXT PRIMARY KEY,
         session_id TEXT REFERENCES sessions(id),
@@ -31,7 +30,7 @@ export async function GET(req: NextRequest) {
     `);
 
     // Create action_cycles table
-    await db.execute(sql`
+    await sql.query(`
       CREATE TABLE IF NOT EXISTS action_cycles (
         id SERIAL PRIMARY KEY,
         session_id TEXT REFERENCES sessions(id) NOT NULL,
@@ -46,9 +45,9 @@ export async function GET(req: NextRequest) {
     `);
 
     // Create indexes
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_sessions_blueprint_id ON sessions(blueprint_id)`);
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_blueprints_session_id ON blueprints(session_id)`);
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_action_cycles_session_id ON action_cycles(session_id)`);
+    await sql.query(`CREATE INDEX IF NOT EXISTS idx_sessions_blueprint_id ON sessions(blueprint_id)`);
+    await sql.query(`CREATE INDEX IF NOT EXISTS idx_blueprints_session_id ON blueprints(session_id)`);
+    await sql.query(`CREATE INDEX IF NOT EXISTS idx_action_cycles_session_id ON action_cycles(session_id)`);
 
     return new Response(
       JSON.stringify({ 
