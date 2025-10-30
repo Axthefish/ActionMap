@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 
-export default function GoalInputPage() {
+interface GoalInputPageProps {
+  onComplete: () => void;
+}
+
+export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
   const [userGoal, setUserGoal] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +83,10 @@ export default function GoalInputPage() {
               }
             } else if (data.type === "done") {
               setShowSuccess(true);
+              // Auto-proceed to dashboard after showing success
+              setTimeout(() => {
+                onComplete();
+              }, 1500);
             } else if (data.type === "error") {
               throw new Error(data.message);
             }
@@ -93,7 +101,7 @@ export default function GoalInputPage() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-[#1a2332] via-[#1f2937] to-[#111827] flex items-center justify-center">
+    <div className="relative h-screen w-screen overflow-hidden flex items-center justify-center">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10">
         <div className="flex items-center gap-3">

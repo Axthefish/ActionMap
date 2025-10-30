@@ -8,7 +8,7 @@ interface WelcomePageProps {
 
 export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-[#1a2332] via-[#1f2937] to-[#111827]">
+    <div className="relative h-screen w-screen overflow-hidden">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10">
         <div className="flex items-center gap-3">
