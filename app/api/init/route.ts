@@ -4,7 +4,6 @@ import { sessions, blueprints } from '@/lib/db/schema';
 import { generateBlueprint, handleAIError } from '@/lib/ai';
 import { generateSessionId, generateBlueprintId } from '@/lib/utils';
 import { InitRequest } from '@/lib/types';
-import { sql } from '@vercel/postgres';
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,22 +35,21 @@ export async function POST(req: NextRequest) {
           const sessionId = generateSessionId();
           const blueprintId = generateBlueprintId();
           
-          // Save to database using raw SQL to avoid default value issues
-          await sql`
-            INSERT INTO sessions (id, user_id, current_position, active_cycle_index, blueprint_id)
-            VALUES (${sessionId}, NULL, ${initial_hypothesis.suggested_position_on_path}, 0, ${blueprintId})
-          `;
+          // Save to database - explicitly set all fields to avoid default issues
+          await db.insert(sessions).values({
+            id: sessionId,
+            currentPosition: initial_hypothesis.suggested_position_on_path,
+            activeCycleIndex: 0,
+            blueprintId: blueprintId,
+          });
           
-          await sql`
-            INSERT INTO blueprints (id, session_id, main_path, milestone_nodes, initial_hypothesis)
-            VALUES (
-              ${blueprintId}, 
-              ${sessionId}, 
-              ${JSON.stringify(blueprint_definition.main_path)}::jsonb,
-              ${JSON.stringify(blueprint_definition.milestone_nodes)}::jsonb,
-              ${JSON.stringify(initial_hypothesis)}::jsonb
-            )
-          `;
+          await db.insert(blueprints).values({
+            id: blueprintId,
+            sessionId: sessionId,
+            mainPath: blueprint_definition.main_path as any,
+            milestoneNodes: blueprint_definition.milestone_nodes as any,
+            initialHypothesis: initial_hypothesis as any,
+          });
           
           console.log('[API /init] Blueprint created successfully, session:', sessionId);
           
