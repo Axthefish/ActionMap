@@ -38,10 +38,8 @@ export async function POST(req: NextRequest) {
           // Save to database
           await db.insert(sessions).values({
             id: sessionId,
-            userId: null,
             currentPosition: initial_hypothesis.suggested_position_on_path,
             activeCycleIndex: 0,
-            lastAssessmentNarrative: null,
             blueprintId: blueprintId,
           });
           

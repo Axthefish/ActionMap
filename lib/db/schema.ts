@@ -42,4 +42,3 @@ export type Blueprint = typeof blueprints.$inferSelect;
 export type InsertBlueprint = typeof blueprints.$inferInsert;
 export type ActionCycle = typeof actionCycles.$inferSelect;
 export type InsertActionCycle = typeof actionCycles.$inferInsert;
-
