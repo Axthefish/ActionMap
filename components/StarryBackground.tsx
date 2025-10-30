@@ -9,6 +9,10 @@ interface Star {
   z: number; // Depth layer: 1 (far), 2 (mid), 3 (near)
   size: number;
   opacity: number;
+  baseOpacity: number; // Base opacity for twinkling
+  twinkleSpeed: number; // How fast the star twinkles
+  twinklePhase: number; // Random phase offset for twinkling
+  color: string; // Star color
 }
 
 export default function StarryBackground() {
@@ -41,6 +45,17 @@ export default function StarryBackground() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     
+    // Star color palette - realistic star colors
+    const starColors = [
+      'rgba(255, 255, 255, 1)',      // White (most common)
+      'rgba(255, 255, 255, 1)',      // White
+      'rgba(255, 255, 255, 1)',      // White
+      'rgba(245, 245, 255, 1)',      // Cool white
+      'rgba(255, 248, 240, 1)',      // Warm white
+      'rgba(200, 220, 255, 1)',      // Blue tint
+      'rgba(255, 240, 220, 1)',      // Yellow tint
+    ];
+    
     // Initialize stars with three depth layers
     const initStars = () => {
       starsRef.current = [];
@@ -50,36 +65,51 @@ export default function StarryBackground() {
         near: Math.floor(config.starCount * 0.2),   // 20% near
       };
       
-      // Far stars (smallest, slowest)
+      // Far stars (smallest, slowest, dimmest)
       for (let i = 0; i < starCounts.far; i++) {
+        const baseOpacity = Math.random() * 0.2 + 0.1;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 1,
-          size: Math.random() * 1 + 0.5,
-          opacity: Math.random() * 0.3 + 0.2,
+          size: Math.random() * 0.8 + 0.3,
+          opacity: baseOpacity,
+          baseOpacity,
+          twinkleSpeed: Math.random() * 0.5 + 0.3,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: starColors[Math.floor(Math.random() * starColors.length)],
         });
       }
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {
+        const baseOpacity = Math.random() * 0.35 + 0.25;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 2,
-          size: Math.random() * 1.5 + 1,
-          opacity: Math.random() * 0.4 + 0.3,
+          size: Math.random() * 1.2 + 0.6,
+          opacity: baseOpacity,
+          baseOpacity,
+          twinkleSpeed: Math.random() * 0.8 + 0.4,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: starColors[Math.floor(Math.random() * starColors.length)],
         });
       }
       
-      // Near stars (largest, fastest)
+      // Near stars (largest, fastest, brightest) - fewer of these
       for (let i = 0; i < starCounts.near; i++) {
+        const baseOpacity = Math.random() * 0.4 + 0.4;
         starsRef.current.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           z: 3,
-          size: Math.random() * 2 + 1.5,
-          opacity: Math.random() * 0.5 + 0.4,
+          size: Math.random() * 1.5 + 0.9,
+          opacity: baseOpacity,
+          baseOpacity,
+          twinkleSpeed: Math.random() * 1.2 + 0.6,
+          twinklePhase: Math.random() * Math.PI * 2,
+          color: starColors[Math.floor(Math.random() * starColors.length)],
         });
       }
     };
@@ -111,9 +141,11 @@ export default function StarryBackground() {
         rotationRef.current += 0.0001 * config.animationSpeed;
       }
       
-      // Draw stars
+      // Draw stars with twinkling effect
+      const currentTime = Date.now() * 0.001; // Convert to seconds
+      
       starsRef.current.forEach((star) => {
-        // Apply parallax rotation based on depth
+        // Apply rotation around user (center of screen) with parallax based on depth
         let x = star.x;
         let y = star.y;
         
@@ -124,7 +156,8 @@ export default function StarryBackground() {
           const dy = star.y - centerY;
           const angle = Math.atan2(dy, dx);
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const rotationSpeed = rotationRef.current * star.z * 0.3;
+          // Stars rotate around user (center) - further stars rotate slower (parallax)
+          const rotationSpeed = rotationRef.current * (1 / star.z) * 0.5;
           
           x = centerX + Math.cos(angle + rotationSpeed) * distance;
           y = centerY + Math.sin(angle + rotationSpeed) * distance;
@@ -136,18 +169,51 @@ export default function StarryBackground() {
           if (y > height) y -= height;
         }
         
-        // Draw star as circle
+        // Calculate twinkling opacity (gentle sine wave)
+        const twinkle = Math.sin(currentTime * star.twinkleSpeed + star.twinklePhase) * 0.2 + 0.8;
+        const currentOpacity = star.baseOpacity * twinkle;
+        
+        // Extract color components from star.color
+        const colorMatch = star.color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        if (!colorMatch) return;
+        const [_, r, g, b] = colorMatch;
+        
+        // Draw soft glow (larger, more transparent)
+        if (star.size > 0.8) {
+          const gradient = ctx.createRadialGradient(x, y, 0, x, y, star.size * 3);
+          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.15})`);
+          gradient.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.05})`);
+          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(x, y, star.size * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Draw main star core with gradient for softer edges
+        const coreGradient = ctx.createRadialGradient(x, y, 0, x, y, star.size);
+        coreGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${currentOpacity})`);
+        coreGradient.addColorStop(0.7, `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.6})`);
+        coreGradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+        
+        ctx.fillStyle = coreGradient;
         ctx.beginPath();
         ctx.arc(x, y, star.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
         ctx.fill();
         
-        // Add glow for larger stars
-        if (star.size > 2 && star.z === 3) {
+        // Add subtle cross-flare for brighter stars
+        if (star.size > 1 && currentOpacity > 0.5) {
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.3})`;
+          ctx.lineWidth = 0.5;
           ctx.beginPath();
-          ctx.arc(x, y, star.size * 1.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(135, 206, 235, ${star.opacity * 0.2})`;
-          ctx.fill();
+          // Vertical line
+          ctx.moveTo(x, y - star.size * 1.5);
+          ctx.lineTo(x, y + star.size * 1.5);
+          // Horizontal line
+          ctx.moveTo(x - star.size * 1.5, y);
+          ctx.lineTo(x + star.size * 1.5, y);
+          ctx.stroke();
         }
       });
       

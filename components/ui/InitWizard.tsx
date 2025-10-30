@@ -12,6 +12,7 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState('');
+  const [showResult, setShowResult] = useState(false);
   
   const {
     setSessionId,
@@ -84,8 +85,8 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
                 setNarrative(data.text);
               }
             } else if (data.type === 'done') {
-              // Stream complete
-              onInitComplete();
+              // Stream complete - show result instead of auto-proceeding
+              setShowResult(true);
             } else if (data.type === 'error') {
               throw new Error(data.message);
             }
@@ -99,6 +100,38 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
       setIsLoading(false);
     }
   };
+  
+  // If result is ready, show confirmation step
+  if (showResult) {
+    return (
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+        <div className="glass-strong rounded-xl p-8 max-w-2xl w-full shadow-lg">
+          <h2 className="text-apple-h1 font-bold mb-4 text-success">
+            ✓ Blueprint Generated Successfully!
+          </h2>
+          <p className="text-foreground/80 text-apple-body mb-4 leading-relaxed">
+            Your strategic blueprint has been created. You can now see the 3D visualization and AI analysis.
+          </p>
+          
+          {streamingNarrative && (
+            <div className="mb-6 p-4 glass rounded-lg border border-success/30 max-h-64 overflow-y-auto">
+              <p className="text-sm text-foreground/80 mb-2 font-medium">AI Analysis:</p>
+              <p className="text-foreground text-sm whitespace-pre-wrap">{streamingNarrative}</p>
+            </div>
+          )}
+          
+          <button
+            onClick={onInitComplete}
+            className="w-full bg-success hover:bg-success/90 text-white 
+                     font-semibold py-3 px-6 rounded-lg transition-all duration-200 
+                     hover:shadow-lg active:scale-95"
+          >
+            Continue to View Blueprint
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center z-50 p-4">
