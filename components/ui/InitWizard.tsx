@@ -23,7 +23,10 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!userGoal.trim()) {
+    const trimmedGoal = userGoal.trim();
+    console.log('[InitWizard] Submit with goal:', trimmedGoal);
+    
+    if (!trimmedGoal) {
       setError('Please enter your goal');
       return;
     }
@@ -107,13 +110,19 @@ export default function InitWizard({ onInitComplete }: InitWizardProps) {
         </p>
         
         <form onSubmit={handleSubmit}>
-          <textarea
-            value={userGoal}
-            onChange={(e) => setUserGoal(e.target.value)}
-            placeholder="Example: I want to build a SaaS product and grow it to $10k MRR..."
-            className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-4 mb-4 focus:outline-none focus:border-blue-500 resize-none"
-            disabled={isLoading}
-          />
+          <div className="mb-2">
+            <textarea
+              value={userGoal}
+              onChange={(e) => setUserGoal(e.target.value)}
+              placeholder="Example: I want to build a SaaS product and grow it to $10k MRR..."
+              className="w-full h-32 bg-gray-800 text-white border border-gray-600 rounded-lg p-4 focus:outline-none focus:border-blue-500 resize-none"
+              disabled={isLoading}
+              autoFocus
+            />
+            <div className="text-xs text-gray-500 mt-1 text-right">
+              {userGoal.length} characters
+            </div>
+          </div>
           
           {error && (
             <p className="text-red-500 mb-4">{error}</p>
