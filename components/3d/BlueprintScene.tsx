@@ -1,6 +1,6 @@
 'use client';
 
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { MapControls, OrthographicCamera } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import MainPath from './MainPath';
@@ -16,6 +16,7 @@ export default function BlueprintScene() {
   const blueprintDefinition = useBlueprintStore((state) => state.blueprintDefinition);
   const currentPosition = useBlueprintStore((state) => state.currentPosition);
   const actionLines = useBlueprintStore((state) => state.actionLines);
+  
   const controlsRef = useRef<any>(null);
   return (
     <Canvas
@@ -24,7 +25,7 @@ export default function BlueprintScene() {
       gl={{ alpha: true, antialias: true }}
     >
       {/* Top-down orthographic camera for true map-like view */}
-      <OrthographicCamera makeDefault position={[0, 12, 0]} zoom={70} near={0.1} far={100} />
+      <OrthographicCamera makeDefault position={[0, 15, 0]} zoom={80} near={0.1} far={100} />
       
       {/* Soft ambient since we view from above */}
       <ambientLight intensity={0.6} />
@@ -56,8 +57,8 @@ export default function BlueprintScene() {
         enableRotate={false}
         enablePan={true}
         enableZoom={true}
-        minZoom={30}
-        maxZoom={140}
+        minZoom={40}
+        maxZoom={150}
         zoomSpeed={1.0}
         panSpeed={0.6}
       />
@@ -94,7 +95,7 @@ function SceneStars() {
   );
 }
 
-// (Removed FirstPersonCamera in top-down mode)
+// First-person camera not used in top-down mode
 
 interface StarLayerProps {
   count: number;

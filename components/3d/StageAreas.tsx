@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Text } from '@react-three/drei';
+import { Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { BlueprintDefinition, MilestoneNode } from '@/lib/types';
 
@@ -46,13 +46,14 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
     });
   }, [main_path, currentPosition, segmentLength, contentByStage]);
 
+  const areaDepth = 1.6;
   return (
     <group>
       {segments.map((s, i) => (
         <group key={`stage-area-${i}`} position={[(s.startX + s.endX) / 2, 0, 0]}>
-          {/* Semi-transparent area rectangle behind the path */}
-          <mesh position={[0, 0.32, -0.05]}> 
-            <planeGeometry args={[s.endX - s.startX, 1.6]} />
+          {/* Flat area on ground (XZ plane) for top-down view */}
+          <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[s.endX - s.startX, areaDepth]} />
             <meshBasicMaterial
               color={getAreaColor(s.status)}
               transparent
@@ -61,51 +62,44 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
             />
           </mesh>
 
-          {/* Boundary lines of the region */}
-          <mesh position={[-(s.endX - s.startX) / 2, 0.35, -0.04]}>
-            <boxGeometry args={[0.02, 1.6, 0.02]} />
-            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.6} transparent />
+          {/* Boundary lines along Z (visible from top) */}
+          <mesh position={[-(s.endX - s.startX) / 2, 0.01, 0]}>
+            <boxGeometry args={[0.02, 0.02, areaDepth]} />
+            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.7} transparent depthWrite={false} />
           </mesh>
-          <mesh position={[(s.endX - s.startX) / 2, 0.35, -0.04]}>
-            <boxGeometry args={[0.02, 1.6, 0.02]} />
-            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.6} transparent />
+          <mesh position={[(s.endX - s.startX) / 2, 0.01, 0]}>
+            <boxGeometry args={[0.02, 0.02, areaDepth]} />
+            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.7} transparent depthWrite={false} />
           </mesh>
 
-          {/* Edge text: show core objective at the top edge to avoid clutter */}
+          {/* Edge text at the top side of area (Html overlay for crispness) */}
           {s.content?.core_objective && (
-            <Text
-              position={[0, 1.25, -0.02]}
-              fontSize={0.16}
-              color={'#e5e7eb'}
-              anchorX="center"
-              anchorY="middle"
-              maxWidth={(s.endX - s.startX) * 0.9}
-              outlineWidth={0.008}
-              outlineColor={'#111827'}
-            >
-              {s.content.core_objective}
-            </Text>
+            <Html position={[0, 0.02, areaDepth / 2 + 0.12]} sprite distanceFactor={12} zIndexRange={[9, 0]}>
+              <div className="rounded-md border border-white/10 bg-slate-900/70 backdrop-blur px-2.5 py-1.5 text-[11px] text-slate-100 shadow">
+                {s.content.core_objective}
+              </div>
+            </Html>
           )}
         </group>
       ))}
 
       {/* Inflection markers at boundaries between stages */}
       {segments.slice(0, -1).map((s, i) => (
-        <group key={`infl-${i}`} position={[s.endX, 0.9, 0]}>
-          {/* glow ring */}
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.18, 0.23, 32]} />
-            <meshBasicMaterial color={'#fbbf24'} transparent opacity={0.8} depthWrite={false} />
+        <group key={`infl-${i}`} position={[s.endX, 0.02, 0]}>
+          {/* glow ring on ground */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.18, 0.24, 48]} />
+            <meshBasicMaterial color={'#fbbf24'} transparent opacity={0.9} depthWrite={false} />
           </mesh>
           {/* inner dot */}
-          <mesh>
-            <sphereGeometry args={[0.05, 16, 16]} />
+          <mesh position={[0, 0.002, 0]}>
+            <circleGeometry args={[0.06, 24]} />
             <meshBasicMaterial color={'#fde68a'} />
           </mesh>
           {/* label */}
-          <Text position={[0, 0.35, 0]} fontSize={0.16} color={'#fde68a'} anchorX="center" anchorY="middle" outlineWidth={0.008} outlineColor={'#111827'}>
-            变化节点
-          </Text>
+          <Html position={[0, 0.02, 0.35]} sprite distanceFactor={12}>
+            <div className="text-[11px] px-1.5 py-[2px] rounded bg-amber-400/20 text-amber-200 border border-amber-300/30">变化节点</div>
+          </Html>
         </group>
       ))}
     </group>
