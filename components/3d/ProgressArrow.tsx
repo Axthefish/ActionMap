@@ -38,24 +38,19 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
     return { positions, opacities };
   }, []);
   
-  // Complex floating animation
+  // Subtle floating animation (top-down, keep low height)
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
     
     if (groupRef.current) {
-      // Natural floating motion with sine + cosine
-      const floatY = Math.sin(time * 1.5) * 0.08 + Math.cos(time * 0.8) * 0.04;
-      groupRef.current.position.y = 0.6 + floatY;
+      const floatY = Math.sin(time * 1.5) * 0.02;
+      groupRef.current.position.y = 0.2 + floatY;
       
       // Subtle rotation wobble
       groupRef.current.rotation.z = Math.sin(time * 2) * 0.05;
     }
     
-    // Spotlight pulsing
-    if (spotLightRef.current) {
-      const pulse = Math.sin(time * 3) * 0.2 + 0.8;
-      spotLightRef.current.intensity = 1.5 * pulse;
-    }
+    // Remove spotlight pulsing for top-down map clarity
     
     // Trail animation
     if (trailRef.current) {
@@ -79,8 +74,8 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
       ref={groupRef}
       position-x={animatedPosition.to((p) => -pathLength / 2 + p * pathLength)}
     >
-      {/* Main arrow body - 3D extruded shape */}
-      <mesh rotation={[0, 0, Math.PI]}>
+      {/* Flat-ish arrow for top-down view (axis along +Z) */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.25, 0.5, 6]} />
         <meshPhysicalMaterial
           color="#ff6b6b"
@@ -93,7 +88,7 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
       </mesh>
       
       {/* Arrow shaft */}
-      <mesh position={[0, 0.35, 0]}>
+      <mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.08, 0.08, 0.3, 8]} />
         <meshPhysicalMaterial
           color="#ff6b6b"
@@ -154,20 +149,7 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
         />
       </mesh>
       
-      {/* SpotLight projecting down to path */}
-      <spotLight
-        ref={spotLightRef}
-        position={[0, 0, 0]}
-        angle={0.3}
-        penumbra={0.5}
-        intensity={1.5}
-        color="#ff6b6b"
-        distance={3}
-        target-position={[0, -1, 0]}
-      />
-      
-      {/* Target for spotlight */}
-      <object3D position={[0, -1, 0]} />
+      {/* No spotlight in top-down mode */}
     </animated.group>
   );
 }
