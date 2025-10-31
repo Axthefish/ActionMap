@@ -8,14 +8,14 @@ interface GoalInputPageProps {
   onComplete: () => void;
 }
 
-type FlowStage = 'input' | 'loading' | 'streaming' | 'transitioning';
+type FlowStage = 'input' | 'loading' | 'streaming';
 
 export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
   const [userGoal, setUserGoal] = useState("");
   const [flowStage, setFlowStage] = useState<FlowStage>('input');
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState("");
-  const [showTransition, setShowTransition] = useState(false);
+  
 
   const {
     setSessionId,
@@ -94,9 +94,6 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
                 setNarrative(data.text);
               }
             } else if (data.type === "done") {
-              // Start transition animation
-              setFlowStage('transitioning');
-              await new Promise(resolve => setTimeout(resolve, 1500));
               onComplete();
             } else if (data.type === "error") {
               throw new Error(data.message);
@@ -186,8 +183,8 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
         {flowStage === 'loading' && (
           <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
             <div className="relative">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              <div className="absolute inset-0 w-16 h-16 rounded-full bg-primary/20 blur-xl animate-pulse" />
+              <Loader2 className="w-16 h-16 text-foreground animate-spin" />
+              <div className="absolute inset-0 w-16 h-16 rounded-full bg-foreground/10 blur-xl animate-pulse" />
             </div>
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-semibold text-foreground">Analyzing Your Ambition</h2>
@@ -198,26 +195,15 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
 
         {/* Stage 3: Streaming Narrative (Centered) */}
         {flowStage === 'streaming' && (
-          <div className={`max-w-3xl w-full transition-all duration-1000 ${showTransition ? 'translate-x-[-40%] scale-90' : ''}`}>
-            <div className="glass-strong rounded-2xl p-8 border border-primary/30 animate-in fade-in duration-500">
-              <h2 className="text-2xl font-semibold text-primary mb-4">Strategic Briefing</h2>
+          <div className={`max-w-3xl w-full transition-all duration-1000`}>
+            <div className="glass-strong rounded-2xl p-8 border border-white/20 animate-in fade-in duration-500">
+              <h2 className="text-2xl font-semibold text-foreground mb-4">Strategic Briefing</h2>
               <div className="prose prose-invert max-w-none">
                 <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
                   {streamingNarrative}
-                  <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1 rounded-sm"></span>
+                  <span className="inline-block w-2 h-4 bg-foreground/70 animate-pulse ml-1 rounded-sm"></span>
                 </p>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Stage 4: Transitioning */}
-        {flowStage === 'transitioning' && (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center space-y-6 animate-in fade-in duration-500">
-              <div className="text-6xl mb-4">✓</div>
-              <h1 className="text-4xl font-bold text-success">Blueprint Ready!</h1>
-              <p className="text-xl text-foreground/70">Preparing your visualization...</p>
             </div>
           </div>
         )}

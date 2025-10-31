@@ -4,15 +4,20 @@ import { useEffect, useRef } from 'react';
 import { detectPerformanceTier, getPerformanceConfig } from '@/lib/performance';
 
 interface Star {
-  x: number;
-  y: number;
-  z: number; // Depth layer: 1 (far), 2 (mid), 3 (near)
+  // Static color/appearance
+  z: number; // 1 (far), 2 (mid), 3 (near)
   size: number;
   opacity: number;
-  baseOpacity: number; // Base opacity for twinkling
-  twinkleSpeed: number; // How fast the star twinkles
-  twinklePhase: number; // Random phase offset for twinkling
-  color: string; // Star color
+  baseOpacity: number; // for twinkling
+  twinkleSpeed: number;
+  twinklePhase: number;
+  color: string;
+  // Galaxy-band motion (in a frame rotated -45deg)
+  u0: number; // initial longitudinal coord (px)
+  bandOffset: number; // transverse offset (px)
+  bandSpeed: number; // px/sec along band
+  curveAmp: number; // amplitude of arc (px)
+  curveFreq: number; // radians per px
 }
 
 export default function StarryBackground() {
@@ -65,19 +70,26 @@ export default function StarryBackground() {
         near: Math.floor(config.starCount * 0.2),   // 20% near
       };
       
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const bandWidth = Math.max(canvas.width, canvas.height);
+      
       // Far stars (smallest, slowest, dimmest)
       for (let i = 0; i < starCounts.far; i++) {
         const baseOpacity = Math.random() * 0.3 + 0.2;
         starsRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
           z: 1,
-          size: Math.random() * 1.0 + 0.5, // Increased size
+          size: Math.random() * 1.0 + 0.5,
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 0.8 + 0.4, // Faster twinkle
+          twinkleSpeed: Math.random() * 0.8 + 0.4,
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
+          u0: (Math.random() - 0.5) * bandWidth * 2,
+          bandOffset: (Math.random() - 0.5) * (canvas.height * 0.3),
+          bandSpeed: 20 + Math.random() * 20,
+          curveAmp: 20 + Math.random() * 20,
+          curveFreq: 0.01 + Math.random() * 0.02,
         });
       }
       
@@ -85,15 +97,18 @@ export default function StarryBackground() {
       for (let i = 0; i < starCounts.mid; i++) {
         const baseOpacity = Math.random() * 0.4 + 0.35;
         starsRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
           z: 2,
-          size: Math.random() * 1.6 + 0.9, // Increased size
+          size: Math.random() * 1.6 + 0.9,
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 1.0 + 0.5, // Faster twinkle
+          twinkleSpeed: Math.random() * 1.0 + 0.5,
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
+          u0: (Math.random() - 0.5) * bandWidth * 2,
+          bandOffset: (Math.random() - 0.5) * (canvas.height * 0.35),
+          bandSpeed: 35 + Math.random() * 25,
+          curveAmp: 26 + Math.random() * 28,
+          curveFreq: 0.012 + Math.random() * 0.025,
         });
       }
       
@@ -101,15 +116,18 @@ export default function StarryBackground() {
       for (let i = 0; i < starCounts.near; i++) {
         const baseOpacity = Math.random() * 0.5 + 0.5;
         starsRef.current.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
           z: 3,
-          size: Math.random() * 2.0 + 1.2, // Increased size
+          size: Math.random() * 2.0 + 1.2,
           opacity: baseOpacity,
           baseOpacity,
-          twinkleSpeed: Math.random() * 1.5 + 0.8, // Faster twinkle
+          twinkleSpeed: Math.random() * 1.5 + 0.8,
           twinklePhase: Math.random() * Math.PI * 2,
           color: starColors[Math.floor(Math.random() * starColors.length)],
+          u0: (Math.random() - 0.5) * bandWidth * 2,
+          bandOffset: (Math.random() - 0.5) * (canvas.height * 0.4),
+          bandSpeed: 50 + Math.random() * 30,
+          curveAmp: 32 + Math.random() * 32,
+          curveFreq: 0.015 + Math.random() * 0.03,
         });
       }
     };
@@ -136,44 +154,25 @@ export default function StarryBackground() {
       ctx.fillStyle = 'hsl(0, 0%, 7%)'; // Match background color
       ctx.fillRect(0, 0, width, height);
       
-      // Update rotation (parallax effect) - increased speed for visibility
-      if (config.enableStarRotation) {
-        rotationRef.current += 0.001 * config.animationSpeed; // 10x faster for noticeable rotation
-      }
+      rotationRef.current += 0.03 * config.animationSpeed; // drives band movement
       
       // Draw stars with twinkling effect
       const currentTime = Date.now() * 0.001; // Convert to seconds
       
       starsRef.current.forEach((star) => {
-        // Apply rotation around user (center of screen) with parallax based on depth
-        let x = star.x;
-        let y = star.y;
-        
-        if (config.enableStarRotation) {
-          const centerX = width / 2;
-          const centerY = height / 2;
-          const dx = star.x - centerX;
-          const dy = star.y - centerY;
-          const angle = Math.atan2(dy, dx);
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          // Stars rotate diagonally around user (center) - parallax effect
-          const rotationSpeed = rotationRef.current * (1 / star.z) * 2.0;
-          
-          // Diagonal rotation: rotate both around center and add diagonal drift
-          x = centerX + Math.cos(angle + rotationSpeed) * distance;
-          y = centerY + Math.sin(angle + rotationSpeed) * distance;
-          
-          // Add diagonal movement component
-          const diagonalOffset = rotationRef.current * (1 / star.z) * 50;
-          x += diagonalOffset;
-          y += diagonalOffset;
-          
-          // Wrap around edges
-          if (x < 0) x += width;
-          if (x > width) x -= width;
-          if (y < 0) y += height;
-          if (y > height) y -= height;
-        }
+        // Galaxy bands: move along u with sine arc on v, then rotate -45deg
+        const theta = -Math.PI / 4; // diagonal orientation
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        const u = (star.u0 + rotationRef.current * star.bandSpeed * (1 / star.z)) % (width * 2) - width;
+        const v = star.bandOffset + Math.sin(u * star.curveFreq + star.twinklePhase) * star.curveAmp * (1 / star.z);
+
+        // rotate back to screen coords
+        const x = centerX + u * cosT - v * sinT;
+        const y = centerY + u * sinT + v * cosT;
         
         // Calculate twinkling opacity (gentle sine wave)
         const twinkle = Math.sin(currentTime * star.twinkleSpeed + star.twinklePhase) * 0.2 + 0.8;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import MainPath from './MainPath';
@@ -18,7 +18,7 @@ export default function BlueprintScene() {
   return (
     <Canvas
       camera={{
-        position: [0, 8, 12],
+        position: [0, 1.2, 2.5],
         fov: 50,
       }}
       style={{ background: 'transparent' }}
@@ -38,6 +38,9 @@ export default function BlueprintScene() {
       {/* Three-layer starfield */}
       <SceneStars />
       
+      {/* Sync camera to arrow first-person position */}
+      <FirstPersonCamera arrowPosition={currentPosition} />
+
       {/* Blueprint elements */}
       <Suspense fallback={null}>
         {blueprintDefinition && (
@@ -89,11 +92,23 @@ function SceneStars() {
   
   return (
     <>
-      <StarLayer count={Math.floor(sceneStarCount * 0.5)} distance={30} size={0.04} layer={1} speed={config.animationSpeed} enableRotation={config.enableStarRotation} />
-      <StarLayer count={Math.floor(sceneStarCount * 0.3)} distance={20} size={0.06} layer={2} speed={config.animationSpeed} enableRotation={config.enableStarRotation} />
-      <StarLayer count={Math.floor(sceneStarCount * 0.2)} distance={15} size={0.08} layer={3} speed={config.animationSpeed} enableRotation={config.enableStarRotation} />
+      <StarLayer count={Math.floor(sceneStarCount * 0.5)} distance={30} size={0.04} layer={1} speed={0} enableRotation={false} />
+      <StarLayer count={Math.floor(sceneStarCount * 0.3)} distance={20} size={0.06} layer={2} speed={0} enableRotation={false} />
+      <StarLayer count={Math.floor(sceneStarCount * 0.2)} distance={15} size={0.08} layer={3} speed={0} enableRotation={false} />
     </>
   );
+}
+
+// Camera that snaps to arrow (first-person) whenever position changes
+function FirstPersonCamera({ arrowPosition }: { arrowPosition: number }) {
+  const { camera } = useThree();
+  useEffect(() => {
+    const pathLength = 10;
+    const x = -pathLength / 2 + arrowPosition * pathLength;
+    camera.position.set(x, 1.2, 2.5);
+    camera.lookAt(x + 1, 0.6, 0);
+  }, [arrowPosition, camera]);
+  return null;
 }
 
 interface StarLayerProps {

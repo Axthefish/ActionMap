@@ -45,7 +45,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
     case 'high':
       return {
         tier,
-        starCount: 2624, // Further reduced by 1/5 (3280 * 0.8)
+        starCount: 1968, // Reduced by additional 1/4 (2624 * 0.75)
         pixelRatio: Math.min(window.devicePixelRatio, 2),
         animationSpeed: 1.0,
         enableParticles: true,
@@ -55,7 +55,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
     case 'medium':
       return {
         tier,
-        starCount: 1376, // Further reduced by 1/5 (1720 * 0.8)
+        starCount: 1032, // Reduced by additional 1/4 (1376 * 0.75)
         pixelRatio: Math.min(window.devicePixelRatio, 1.5),
         animationSpeed: 0.7,
         enableParticles: true,
@@ -65,7 +65,7 @@ export function getPerformanceConfig(tier: PerformanceTier): PerformanceConfig {
     case 'low':
       return {
         tier,
-        starCount: 512, // Further reduced by 1/5 (640 * 0.8)
+        starCount: 384, // Reduced by additional 1/4 (512 * 0.75)
         pixelRatio: 1,
         animationSpeed: 0.4,
         enableParticles: false,

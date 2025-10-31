@@ -32,7 +32,7 @@ export default function NarrativePanel() {
   
   return (
     <div className="h-full overflow-y-auto p-6 glass-strong border-r border-border/20">
-      <h2 className="text-apple-h2 font-semibold mb-4 text-primary">
+      <h2 className="text-apple-h2 font-semibold mb-4 text-foreground">
         Strategic Briefing
       </h2>
       
@@ -43,8 +43,8 @@ export default function NarrativePanel() {
             h2: ({children}) => <h2 className="text-apple-h2 font-semibold mb-3 text-foreground">{children}</h2>,
             h3: ({children}) => <h3 className="text-apple-h3 font-semibold mb-2 text-foreground">{children}</h3>,
             p: ({children}) => <p className="mb-3 text-foreground/90">{children}</p>,
-            strong: ({children}) => <strong className="text-accent font-semibold">{children}</strong>,
-            em: ({children}) => <em className="text-primary">{children}</em>,
+            strong: ({children}) => <strong className="text-foreground font-semibold">{children}</strong>,
+            em: ({children}) => <em className="text-foreground/80">{children}</em>,
             ul: ({children}) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
             ol: ({children}) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
             li: ({children}) => <li className="text-foreground/80">{children}</li>,
