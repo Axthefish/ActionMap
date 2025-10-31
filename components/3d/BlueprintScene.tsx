@@ -1,11 +1,10 @@
 'use client';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { MapControls, OrthographicCamera } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import MainPath from './MainPath';
 import StageAreas from './StageAreas';
-import StageSideContent from './StageSideContent';
 import ProgressArrow from './ProgressArrow';
 import ActionLines from './ActionLines';
 import { useBlueprintStore } from '@/lib/store/blueprintStore';
@@ -20,20 +19,29 @@ export default function BlueprintScene() {
   const controlsRef = useRef<any>(null);
   return (
     <Canvas
-      camera={undefined}
+      camera={{
+        position: [0, 1.2, 2.5],
+        fov: 50,
+      }}
       style={{ background: 'transparent' }}
       gl={{ alpha: true, antialias: true }}
     >
-      {/* Top-down orthographic camera for true map-like view */}
-      <OrthographicCamera makeDefault position={[0, 15, 0]} zoom={80} near={0.1} far={100} />
+      {/* Enhanced lighting system */}
+      <ambientLight intensity={0.5} />
       
-      {/* Soft ambient since we view from above */}
-      <ambientLight intensity={0.6} />
+      {/* Remove harsh directional light, add subtle fill */}
+      <directionalLight position={[5, 10, 5]} intensity={0.2} color="#ffffff" />
+      
+      {/* Point lights for depth and atmosphere */}
+      <pointLight position={[-8, 5, -5]} intensity={0.4} color="#4a9eff" distance={20} />
+      <pointLight position={[8, 5, -5]} intensity={0.3} color="#87ceeb" distance={20} />
+      <pointLight position={[0, -5, 5]} intensity={0.2} color="#1e3a8a" distance={15} />
       
       {/* Three-layer starfield */}
       <SceneStars />
       
-      {/* No first-person snapping in top-down mode */}
+      {/* Hybrid top-down camera preset (not pure ortho) */}
+      <TopDownCameraRig controlsRef={controlsRef} active={true} />
 
       {/* Blueprint elements */}
       <Suspense fallback={null}>
@@ -41,9 +49,8 @@ export default function BlueprintScene() {
           <>
             {/* Stage regions rendered behind the path to reduce clutter */}
             <StageAreas blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
-            <StageSideContent blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
             <MainPath blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
-            <ProgressArrow position={currentPosition} />
+            <ProgressArrow position={currentPosition} yOffset={0.2} />
             {actionLines.length > 0 && (
               <ActionLines actionLines={actionLines} arrowPosition={currentPosition} />
             )}
@@ -51,16 +58,21 @@ export default function BlueprintScene() {
         )}
       </Suspense>
       
-      {/* Map-style controls: pan + zoom only, rotation disabled to preserve orthographic top-down */}
-      <MapControls
+      {/* Camera controls optimized for top-down viewing */}
+      <OrbitControls
         ref={controlsRef}
-        enableRotate={false}
-        enablePan={true}
         enableZoom={true}
-        minZoom={40}
-        maxZoom={150}
-        zoomSpeed={1.0}
-        panSpeed={0.6}
+        enablePan={true}
+        enableRotate={true}
+        minDistance={4}
+        maxDistance={50}
+        // Polar angle near 0 is top-down. Constrain to a shallow tilt.
+        minPolarAngle={0.05}
+        maxPolarAngle={0.55}
+        minAzimuthAngle={-Math.PI / 8}
+        maxAzimuthAngle={Math.PI / 8}
+        enableDamping={true}
+        dampingFactor={0.05}
       />
     </Canvas>
   );
@@ -95,7 +107,38 @@ function SceneStars() {
   );
 }
 
-// First-person camera not used in top-down mode
+// Camera that snaps to arrow (first-person) whenever position changes
+function FirstPersonCamera({ arrowPosition, hasBlueprint, setOrbitTarget }: { arrowPosition: number; hasBlueprint: boolean; setOrbitTarget: (x:number,y:number,z:number)=>void }) {
+  const { camera } = useThree();
+  const initialSetRef = useRef(false);
+  useEffect(() => {
+    if (initialSetRef.current) return;
+    if (!hasBlueprint) return;
+    const pathLength = 10;
+    const x = -pathLength / 2 + arrowPosition * pathLength;
+    camera.position.set(x, 1.2, 2.5);
+    camera.lookAt(x + 1, 0.6, 0);
+    setOrbitTarget(x + 1, 0.6, 0);
+    initialSetRef.current = true; // only set on first render
+  }, [arrowPosition, hasBlueprint, camera]);
+  return null;
+}
+
+// Sets an initial top-down-like perspective camera and aligns OrbitControls target
+function TopDownCameraRig({ controlsRef, active }: { controlsRef: any; active: boolean }) {
+  const { camera } = useThree();
+  useEffect(() => {
+    if (!active) return;
+    // Position the camera above and slightly tilted for a map-like perspective
+    camera.position.set(0, 8.5, 6.5);
+    camera.lookAt(0, 0.4, 0);
+    if (controlsRef?.current) {
+      controlsRef.current.target.set(0, 0.4, 0);
+      controlsRef.current.update();
+    }
+  }, [active, controlsRef, camera]);
+  return null;
+}
 
 interface StarLayerProps {
   count: number;

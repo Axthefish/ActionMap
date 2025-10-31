@@ -52,7 +52,7 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
       {segments.map((s, i) => (
         <group key={`stage-area-${i}`} position={[(s.startX + s.endX) / 2, 0, 0]}>
           {/* Flat area on ground (XZ plane) for top-down view */}
-          <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[s.endX - s.startX, areaDepth]} />
             <meshBasicMaterial
               color={getAreaColor(s.status)}
@@ -83,7 +83,7 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
         </group>
       ))}
 
-      {/* Inflection markers at boundaries between stages */}
+      {/* Inflection markers at boundaries between stages (on ground) */}
       {segments.slice(0, -1).map((s, i) => (
         <group key={`infl-${i}`} position={[s.endX, 0.02, 0]}>
           {/* glow ring on ground */}

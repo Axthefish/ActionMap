@@ -7,9 +7,10 @@ import * as THREE from 'three';
 
 interface ProgressArrowProps {
   position: number; // 0.0 to 1.0
+  yOffset?: number;
 }
 
-export default function ProgressArrow({ position }: ProgressArrowProps) {
+export default function ProgressArrow({ position, yOffset = 0.6 }: ProgressArrowProps) {
   const groupRef = useRef<THREE.Group>(null);
   const spotLightRef = useRef<THREE.SpotLight>(null);
   const trailRef = useRef<THREE.Points>(null);
@@ -45,7 +46,7 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
     if (groupRef.current) {
       // Natural floating motion with sine + cosine
       const floatY = Math.sin(time * 1.5) * 0.08 + Math.cos(time * 0.8) * 0.04;
-      groupRef.current.position.y = 0.6 + floatY;
+      groupRef.current.position.y = yOffset + floatY * 0.5;
       
       // Subtle rotation wobble
       groupRef.current.rotation.z = Math.sin(time * 2) * 0.05;
