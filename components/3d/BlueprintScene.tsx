@@ -102,11 +102,14 @@ function SceneStars() {
 // Camera that snaps to arrow (first-person) whenever position changes
 function FirstPersonCamera({ arrowPosition }: { arrowPosition: number }) {
   const { camera } = useThree();
+  const initialSetRef = useRef(false);
   useEffect(() => {
+    if (initialSetRef.current) return;
     const pathLength = 10;
     const x = -pathLength / 2 + arrowPosition * pathLength;
     camera.position.set(x, 1.2, 2.5);
     camera.lookAt(x + 1, 0.6, 0);
+    initialSetRef.current = true; // only set on first render
   }, [arrowPosition, camera]);
   return null;
 }

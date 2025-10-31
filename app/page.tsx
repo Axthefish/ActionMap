@@ -27,9 +27,15 @@ type AppStage = 'welcome' | 'input' | 'dashboard';
 export default function Home() {
   const [stage, setStage] = useState<AppStage>('welcome');
   const [showCalibration, setShowCalibration] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
   
   const handleInitComplete = () => {
     setShowCalibration(true);
+  };
+  const startDashboardWithAnimation = () => {
+    setStage('dashboard');
+    setAnimateIn(true);
+    setTimeout(() => setAnimateIn(false), 800);
   };
   
   // Show welcome page
@@ -39,7 +45,7 @@ export default function Home() {
   
   // Show goal input page
   if (stage === 'input') {
-    return <GoalInputPage onComplete={() => setStage('dashboard')} />;
+    return <GoalInputPage onComplete={startDashboardWithAnimation} />;
   }
   
   // Main dashboard - original three-column layout
@@ -49,12 +55,12 @@ export default function Home() {
 
       <div className="grid h-full grid-cols-12 gap-4 p-4">
         <div className="col-span-3">
-          <Card className="h-full p-4 overflow-y-auto">
+          <Card className={`h-full p-4 overflow-y-auto ${animateIn ? 'animate-in fade-in slide-in-from-left-8 duration-700' : ''}`}>
             <NarrativePanel />
           </Card>
         </div>
 
-        <div className="relative col-span-6">
+        <div className={`relative col-span-6 ${animateIn ? 'animate-in fade-in duration-700 delay-150' : ''}`}>
           <BlueprintScene />
           <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 select-none">
             <h1 className="text-center text-2xl font-bold">Dynamic Strategic Blueprint</h1>

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { Text } from '@react-three/drei';
 import { BlueprintDefinition } from '@/lib/types';
 import MilestoneNode from './MilestoneNode';
 import * as THREE from 'three';
@@ -54,6 +55,30 @@ export default function MainPath({ blueprintDefinition, currentPosition }: MainP
           end={seg.end}
           status={seg.status}
         />
+      ))}
+      
+      {/* Stage labels above each segment */}
+      {segments.map((seg) => (
+        <Text
+          key={`label-${seg.segment.segment_id}`}
+          position={[ (seg.start.x + seg.end.x) / 2, 1.1, 0 ]}
+          fontSize={0.35}
+          color={seg.status === 'current' ? '#fff' : '#cbd5e1'}
+          anchorX="center"
+          anchorY="middle"
+          outlineWidth={seg.status === 'current' ? 0.02 : 0.01}
+          outlineColor={seg.status === 'current' ? '#00d4ff' : '#000'}
+        >
+          {seg.segment.stage_name}
+        </Text>
+      ))}
+
+      {/* Separators between stages to emphasize phase boundaries */}
+      {segments.slice(0, -1).map((seg) => (
+        <mesh key={`sep-${seg.segment.segment_id}`} position={[seg.end.x, 0.6, 0]} rotation={[0, 0, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 1.4, 12]} />
+          <meshStandardMaterial color="#64748b" emissive="#64748b" emissiveIntensity={0.2} transparent opacity={0.7} />
+        </mesh>
       ))}
       
       {/* Draw milestone nodes */}

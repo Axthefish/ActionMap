@@ -92,6 +92,31 @@ export default function StarryBackground() {
           curveFreq: 0.01 + Math.random() * 0.02,
         });
       }
+
+      // Add scattered stars on both sides but moving with same direction
+      const addScattered = (count: number, z: number) => {
+        for (let i = 0; i < count; i++) {
+          const baseOpacity = Math.random() * 0.25 + 0.15;
+          starsRef.current.push({
+            z,
+            size: (z === 3 ? (Math.random() * 1.6 + 0.8) : (Math.random() * 1.0 + 0.4)),
+            opacity: baseOpacity,
+            baseOpacity,
+            twinkleSpeed: Math.random() * 1.0 + 0.4,
+            twinklePhase: Math.random() * Math.PI * 2,
+            color: starColors[Math.floor(Math.random() * starColors.length)],
+            u0: (Math.random() - 0.5) * bandWidth * 2.5,
+            bandOffset: (Math.random() - 0.5) * (canvas.height * 0.6),
+            bandSpeed: 30 + Math.random() * 30,
+            curveAmp: 16 + Math.random() * 24,
+            curveFreq: 0.01 + Math.random() * 0.02,
+          });
+        }
+      };
+
+      addScattered(Math.floor(starCounts.far * 0.15), 1);
+      addScattered(Math.floor(starCounts.mid * 0.15), 2);
+      addScattered(Math.floor(starCounts.near * 0.15), 3);
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {
@@ -161,7 +186,7 @@ export default function StarryBackground() {
       
       starsRef.current.forEach((star) => {
         // Galaxy bands: move along u with sine arc on v, then rotate -45deg
-        const theta = -Math.PI / 4; // diagonal orientation
+        const theta = Math.PI / 4; // diagonal orientation (opposite direction)
         const cosT = Math.cos(theta);
         const sinT = Math.sin(theta);
         const centerX = width / 2;

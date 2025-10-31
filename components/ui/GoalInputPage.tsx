@@ -15,7 +15,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
   const [flowStage, setFlowStage] = useState<FlowStage>('input');
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState("");
-  
+  const [slideOut, setSlideOut] = useState(false);
 
   const {
     setSessionId,
@@ -94,6 +94,8 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
                 setNarrative(data.text);
               }
             } else if (data.type === "done") {
+              setSlideOut(true);
+              await new Promise((r) => setTimeout(r, 700));
               onComplete();
             } else if (data.type === "error") {
               throw new Error(data.message);
@@ -195,7 +197,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
 
         {/* Stage 3: Streaming Narrative (Centered) */}
         {flowStage === 'streaming' && (
-          <div className={`max-w-3xl w-full transition-all duration-1000`}>
+          <div className={`max-w-3xl w-full transition-all duration-700 ${slideOut ? 'translate-x-[-40%] scale-90 opacity-0' : ''}`}>
             <div className="glass-strong rounded-2xl p-8 border border-white/20 animate-in fade-in duration-500">
               <h2 className="text-2xl font-semibold text-foreground mb-4">Strategic Briefing</h2>
               <div className="prose prose-invert max-w-none">

@@ -36,7 +36,7 @@ export default function NarrativePanel() {
         Strategic Briefing
       </h2>
       
-      <div className="prose prose-invert max-w-none text-apple-body leading-relaxed">
+      <div className="prose prose-invert max-w-none text-apple-body leading-8 tracking-[-0.005em] prose-p:mb-4 prose-ol:my-3 prose-ul:my-3 prose-li:my-1">
         <ReactMarkdown 
           components={{
             h1: ({children}) => <h1 className="text-apple-h1 font-bold mb-4 text-foreground">{children}</h1>,
