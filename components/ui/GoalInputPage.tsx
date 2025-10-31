@@ -95,7 +95,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
               }
             } else if (data.type === "done") {
               setSlideOut(true);
-              await new Promise((r) => setTimeout(r, 700));
+              await new Promise((r) => setTimeout(r, 1200));
               onComplete();
             } else if (data.type === "error") {
               throw new Error(data.message);
@@ -197,8 +197,8 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
 
         {/* Stage 3: Streaming Narrative (Centered) */}
         {flowStage === 'streaming' && (
-          <div className={`fixed inset-0 z-20 flex items-center justify-center transition-all duration-700 ${slideOut ? 'justify-start pl-6' : ''}`}>
-            <div className={`glass-strong rounded-2xl p-8 border border-white/20 animate-in fade-in duration-500 transition-all duration-700 ${slideOut ? 'w-[28rem] max-w-[32rem]' : 'w-[48rem] max-w-[50rem]'}`}>
+          <div className={`fixed inset-0 z-20 flex items-center justify-center transition-all duration-1000 ${slideOut ? 'justify-start pl-6' : ''}`}>
+            <div className={`rounded-2xl p-8 border border-white/20 bg-foreground/10 backdrop-blur-xl animate-in fade-in duration-500 transition-all duration-1000 ${slideOut ? 'w-[28rem] max-w-[32rem]' : 'w-[48rem] max-w-[50rem]'}`}>
               <h2 className="text-2xl font-semibold text-foreground mb-4">Strategic Briefing</h2>
               <div className="prose prose-invert max-w-none">
                 <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
@@ -207,6 +207,8 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
                 </p>
               </div>
             </div>
+            {/* Fade-in hint for upcoming layout */}
+            <div className={`absolute inset-0 -z-10 transition-opacity duration-1000 ${slideOut ? 'opacity-100' : 'opacity-0'}`} />
           </div>
         )}
       </div>

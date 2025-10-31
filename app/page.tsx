@@ -55,7 +55,7 @@ export default function Home() {
 
       <div className="grid h-full grid-cols-12 gap-4 p-4">
         <div className="col-span-3">
-          <Card className={`h-full p-4 overflow-y-auto ${animateIn ? 'animate-in fade-in slide-in-from-left-8 duration-700' : ''}`}>
+          <Card className={`h-full p-4 overflow-y-auto bg-transparent border border-white/10 ${animateIn ? 'animate-in fade-in slide-in-from-left-8 duration-700' : ''}`}>
             <NarrativePanel />
           </Card>
         </div>
@@ -68,7 +68,7 @@ export default function Home() {
         </div>
 
             <div className="col-span-3">
-              <Card className="h-full p-4 overflow-y-auto">
+              <Card className="h-full p-4 overflow-y-auto bg-transparent border border-white/10">
                 <ActionHUD />
               </Card>
             </div>
