@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text } from '@react-three/drei';
+import { Text, Billboard } from '@react-three/drei';
 import { BlueprintDefinition } from '@/lib/types';
 import MilestoneNode from './MilestoneNode';
 import * as THREE from 'three';
@@ -20,6 +20,14 @@ export default function MainPath({ blueprintDefinition, currentPosition }: MainP
   const segmentLength = pathLength / main_path.length;
   
   // Generate path segments with status
+  const contentByStage = useMemo(() => {
+    const map = new Map<string, { key_signals: string[] }>();
+    milestone_nodes.forEach((n) => {
+      map.set(n.label, { key_signals: n.content.key_signals });
+    });
+    return map;
+  }, [milestone_nodes]);
+
   const segments = useMemo(() => {
     return main_path.map((segment, index) => {
       const startX = -pathLength / 2 + index * segmentLength;
@@ -41,9 +49,10 @@ export default function MainPath({ blueprintDefinition, currentPosition }: MainP
         start: new THREE.Vector3(startX, 0, 0),
         end: new THREE.Vector3(endX, 0, 0),
         status,
+        keySignals: contentByStage.get(segment.stage_name)?.key_signals ?? [],
       };
     });
-  }, [main_path, currentPosition, pathLength, segmentLength]);
+  }, [main_path, currentPosition, pathLength, segmentLength, contentByStage]);
   
   return (
     <group>
@@ -54,6 +63,7 @@ export default function MainPath({ blueprintDefinition, currentPosition }: MainP
           start={seg.start}
           end={seg.end}
           status={seg.status}
+          keySignals={seg.keySignals}
         />
       ))}
       
@@ -100,9 +110,10 @@ interface PathSegmentProps {
   start: THREE.Vector3;
   end: THREE.Vector3;
   status: 'completed' | 'current' | 'future';
+  keySignals: string[];
 }
 
-function PathSegment({ start, end, status }: PathSegmentProps) {
+function PathSegment({ start, end, status, keySignals }: PathSegmentProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const glowRef = useRef<THREE.Mesh>(null);
   
@@ -190,6 +201,30 @@ function PathSegment({ start, end, status }: PathSegmentProps) {
           />
         </mesh>
       )}
+      
+      {/* Stage key signals rendered inside the segment */}
+      {keySignals.slice(0, 3).map((signal, i, arr) => {
+        // Spread texts along the segment's local Y axis
+        const t = (i + 1) / (arr.length + 1); // (0,1)
+        const y = -length / 2 + t * length; // local Y coord
+        const color = status === 'current' ? '#ffffff' : status === 'completed' ? '#d1fae5' : '#94a3b8';
+        const outline = status === 'current' ? '#00d4ff' : '#000000';
+        return (
+          <Billboard key={`ks-${i}`} position={[0, y, 0]}>
+            <Text
+              fontSize={0.18}
+              color={color}
+              anchorX="center"
+              anchorY="middle"
+              maxWidth={1.2}
+              outlineWidth={status === 'current' ? 0.02 : 0.01}
+              outlineColor={outline}
+            >
+              {signal}
+            </Text>
+          </Billboard>
+        );
+      })}
     </group>
   );
 }

@@ -4,6 +4,7 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import MainPath from './MainPath';
+import StageAreas from './StageAreas';
 import ProgressArrow from './ProgressArrow';
 import ActionLines from './ActionLines';
 import { useBlueprintStore } from '@/lib/store/blueprintStore';
@@ -45,6 +46,8 @@ export default function BlueprintScene() {
       <Suspense fallback={null}>
         {blueprintDefinition && (
           <>
+            {/* Stage regions rendered behind the path to reduce clutter */}
+            <StageAreas blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
             <MainPath blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
             <ProgressArrow position={currentPosition} />
             {actionLines.length > 0 && (
@@ -59,10 +62,10 @@ export default function BlueprintScene() {
         enableZoom={true}
         enablePan={true}
         enableRotate={true}
-        minDistance={6}
-        maxDistance={20}
-        maxPolarAngle={Math.PI / 2.2}
-        minPolarAngle={Math.PI / 6}
+        minDistance={2}
+        maxDistance={60}
+        maxPolarAngle={Math.PI / 2.05}
+        minPolarAngle={0.1}
         enableDamping={true}
         dampingFactor={0.05}
       />
