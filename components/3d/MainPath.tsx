@@ -71,12 +71,12 @@ export default function MainPath({ blueprintDefinition, currentPosition }: MainP
       {segments.map((seg) => (
         <Text
           key={`label-${seg.segment.segment_id}`}
-          position={[ (seg.start.x + seg.end.x) / 2, 1.1, 0 ]}
-          fontSize={0.35}
+          position={[ (seg.start.x + seg.end.x) / 2, 1.6, 0 ]}
+          fontSize={0.18}
           color={seg.status === 'current' ? '#fff' : '#cbd5e1'}
           anchorX="center"
           anchorY="middle"
-          outlineWidth={seg.status === 'current' ? 0.02 : 0.01}
+          outlineWidth={seg.status === 'current' ? 0.01 : 0.006}
           outlineColor={seg.status === 'current' ? '#00d4ff' : '#000'}
         >
           {seg.segment.stage_name}

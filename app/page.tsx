@@ -60,7 +60,7 @@ export default function Home() {
           </Card>
         </div>
 
-        <div className={`relative col-span-6 ${animateIn ? 'animate-in fade-in duration-700 delay-150' : ''}`}>
+        <div className={`relative col-span-6 ${animateIn ? 'animate-in fade-in duration-700 delay-150' : ''} transform-gpu will-change-transform`}>
           <BlueprintScene />
           <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 select-none">
             <h1 className="text-center text-2xl font-bold">Dynamic Strategic Blueprint</h1>

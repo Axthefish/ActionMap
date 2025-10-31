@@ -102,16 +102,19 @@ export default function ActionHUD() {
   };
   
   return (
-    <div className="h-full overflow-y-auto p-2">
-      <h2 className="mb-4 text-xl font-bold text-success">Action Center</h2>
+    <div className="h-full overflow-y-auto p-3">
+      <div className="mb-4 flex items-center justify-between">
+        <h2 className="text-xl font-semibold text-foreground">Actions</h2>
+        <span className="text-xs text-foreground/50">Cycle #{useBlueprintStore.getState().activeCycleIndex + 1}</span>
+      </div>
       
       {selectedLine ? (
-        <div className="mb-6 rounded border-l-4 border-success/70 bg-foreground/5 p-4">
+        <div className="mb-6 rounded border border-white/10 bg-foreground/5 p-4">
           <h3 className="mb-2 text-lg font-semibold">{selectedLine.label}</h3>
           <p className="text-sm text-foreground/80">{selectedLine.content}</p>
         </div>
       ) : actionLines.length > 0 ? (
-        <div className="mb-6 rounded bg-foreground/5 p-4">
+        <div className="mb-6 rounded bg-foreground/5 p-4 border border-white/10">
           <p className="text-foreground/70">Click on an action line in the 3D view to see details</p>
         </div>
       ) : null}
@@ -125,14 +128,12 @@ export default function ActionHUD() {
       
       <div className="space-y-4">
         <div>
-          <label className="mb-2 block text-sm font-medium text-foreground/80">
-            Observations & Progress
-          </label>
+          <label className="mb-2 block text-sm font-medium text-foreground/80">Observations</label>
           <textarea
             value={observations}
             onChange={(e) => setObservations(e.target.value)}
             placeholder="What did you observe after taking action? What worked? What didn't?"
-            className="h-32 w-full resize-none rounded border border-white/10 bg-foreground/5 p-3 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-success/60"
+            className="h-32 w-full resize-none rounded border border-white/10 bg-foreground/5 p-3 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-foreground/30"
             disabled={isLoading || !sessionId}
           />
         </div>
@@ -144,15 +145,15 @@ export default function ActionHUD() {
         <Button
           onClick={handleCompleteCycle}
           disabled={isLoading || !sessionId || !observations.trim()}
-          className="w-full"
+          className="w-full bg-foreground text-background hover:bg-foreground/90"
         >
           {isLoading ? 'Processing...' : 'Complete Cycle'}
         </Button>
       </div>
       
       {!sessionId && (
-        <div className="mt-4 rounded border border-warning/40 bg-foreground/5 p-4">
-          <p className="text-sm text-warning">Please initialize a session first</p>
+        <div className="mt-4 rounded border border-white/10 bg-foreground/5 p-4">
+          <p className="text-sm text-foreground/70">Please initialize a session first</p>
         </div>
       )}
     </div>

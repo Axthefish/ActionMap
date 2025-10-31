@@ -16,6 +16,7 @@ export default function BlueprintScene() {
   const currentPosition = useBlueprintStore((state) => state.currentPosition);
   const actionLines = useBlueprintStore((state) => state.actionLines);
   
+  const controlsRef = useRef<any>(null);
   return (
     <Canvas
       camera={{
@@ -40,7 +41,16 @@ export default function BlueprintScene() {
       <SceneStars />
       
       {/* Sync camera to arrow first-person position */}
-      <FirstPersonCamera arrowPosition={currentPosition} hasBlueprint={!!blueprintDefinition} />
+      <FirstPersonCamera 
+        arrowPosition={currentPosition} 
+        hasBlueprint={!!blueprintDefinition}
+        setOrbitTarget={(x:number,y:number,z:number)=>{
+          if (controlsRef.current) {
+            controlsRef.current.target.set(x,y,z);
+            controlsRef.current.update();
+          }
+        }}
+      />
 
       {/* Blueprint elements */}
       <Suspense fallback={null}>
@@ -59,6 +69,7 @@ export default function BlueprintScene() {
       
       {/* Camera controls with optimized settings */}
       <OrbitControls
+        ref={controlsRef}
         enableZoom={true}
         enablePan={true}
         enableRotate={true}
@@ -103,7 +114,7 @@ function SceneStars() {
 }
 
 // Camera that snaps to arrow (first-person) whenever position changes
-function FirstPersonCamera({ arrowPosition, hasBlueprint }: { arrowPosition: number; hasBlueprint: boolean }) {
+function FirstPersonCamera({ arrowPosition, hasBlueprint, setOrbitTarget }: { arrowPosition: number; hasBlueprint: boolean; setOrbitTarget: (x:number,y:number,z:number)=>void }) {
   const { camera } = useThree();
   const initialSetRef = useRef(false);
   useEffect(() => {
@@ -113,6 +124,7 @@ function FirstPersonCamera({ arrowPosition, hasBlueprint }: { arrowPosition: num
     const x = -pathLength / 2 + arrowPosition * pathLength;
     camera.position.set(x, 1.2, 2.5);
     camera.lookAt(x + 1, 0.6, 0);
+    setOrbitTarget(x + 1, 0.6, 0);
     initialSetRef.current = true; // only set on first render
   }, [arrowPosition, hasBlueprint, camera]);
   return null;

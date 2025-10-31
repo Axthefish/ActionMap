@@ -51,12 +51,13 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
       {segments.map((s, i) => (
         <group key={`stage-area-${i}`} position={[(s.startX + s.endX) / 2, 0, 0]}>
           {/* Semi-transparent area rectangle behind the path */}
-          <mesh position={[0, 0.35, -0.05]}>
+          <mesh position={[0, 0.32, -0.05]}> 
             <planeGeometry args={[s.endX - s.startX, 1.6]} />
             <meshBasicMaterial
               color={getAreaColor(s.status)}
               transparent
               opacity={getAreaOpacity(s.status)}
+              depthWrite={false}
             />
           </mesh>
 
@@ -73,14 +74,14 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
           {/* Edge text: show core objective at the top edge to avoid clutter */}
           {s.content?.core_objective && (
             <Text
-              position={[0, 1.3, 0]}
-              fontSize={0.22}
-              color={s.status === 'current' ? '#ffffff' : '#cbd5e1'}
+              position={[0, 1.25, -0.02]}
+              fontSize={0.16}
+              color={'#e5e7eb'}
               anchorX="center"
               anchorY="middle"
               maxWidth={(s.endX - s.startX) * 0.9}
-              outlineWidth={s.status === 'current' ? 0.02 : 0.01}
-              outlineColor={s.status === 'current' ? '#00d4ff' : '#000'}
+              outlineWidth={0.008}
+              outlineColor={'#111827'}
             >
               {s.content.core_objective}
             </Text>
@@ -94,33 +95,33 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
 function getAreaColor(status: ComputedSegment['status']) {
   switch (status) {
     case 'completed':
-      return '#10b981';
+      return '#4ade80';
     case 'current':
-      return '#00d4ff';
+      return '#60a5fa';
     case 'future':
     default:
-      return '#64748b';
+      return '#475569';
   }
 }
 
 function getAreaOpacity(status: ComputedSegment['status']) {
   switch (status) {
     case 'completed':
-      return 0.12;
+      return 0.10;
     case 'current':
-      return 0.18;
+      return 0.14;
     case 'future':
     default:
-      return 0.08;
+      return 0.06;
   }
 }
 
 function getBorderColor(status: ComputedSegment['status']) {
   switch (status) {
     case 'completed':
-      return '#34d399';
+      return '#a7f3d0';
     case 'current':
-      return '#22d3ee';
+      return '#93c5fd';
     case 'future':
     default:
       return '#94a3b8';

@@ -140,8 +140,34 @@ export default function StarryBackground() {
         }
       };
 
-      addCornerCluster(Math.floor(starCounts.mid * 0.08), +1, 2); // top-right
-      addCornerCluster(Math.floor(starCounts.mid * 0.08), -1, 2); // bottom-left
+      addCornerCluster(Math.floor(starCounts.mid * 0.12), +1, 2); // top-right more dense
+      addCornerCluster(Math.floor(starCounts.mid * 0.12), -1, 2); // bottom-left more dense
+
+      // Side bands near left/right edges to avoid emptiness
+      const addSideBand = (side: 'left' | 'right', count: number) => {
+        const sideSign = side === 'left' ? -1 : 1;
+        for (let i = 0; i < count; i++) {
+          const z = [1,2,3][Math.floor(Math.random()*3)] as 1|2|3;
+          const baseOpacity = Math.random() * 0.3 + 0.2;
+          starsRef.current.push({
+            z,
+            size: (z === 3 ? Math.random() * 1.6 + 0.8 : Math.random() * 1.2 + 0.6),
+            opacity: baseOpacity,
+            baseOpacity,
+            twinkleSpeed: Math.random() * 1.0 + 0.5,
+            twinklePhase: Math.random() * Math.PI * 2,
+            color: starColors[Math.floor(Math.random() * starColors.length)],
+            u0: sideSign * (bandWidth * (0.9 + Math.random() * 0.3)),
+            bandOffset: (Math.random() - 0.5) * (canvas.height * 0.8),
+            bandSpeed: 35 + Math.random() * 30,
+            curveAmp: 18 + Math.random() * 26,
+            curveFreq: 0.012 + Math.random() * 0.02,
+          });
+        }
+      };
+
+      addSideBand('left', Math.floor(config.starCount * 0.08));
+      addSideBand('right', Math.floor(config.starCount * 0.08));
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {
