@@ -88,6 +88,26 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
           )}
         </group>
       ))}
+
+      {/* Inflection markers at boundaries between stages */}
+      {segments.slice(0, -1).map((s, i) => (
+        <group key={`infl-${i}`} position={[s.endX, 0.9, 0]}>
+          {/* glow ring */}
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.18, 0.23, 32]} />
+            <meshBasicMaterial color={'#fbbf24'} transparent opacity={0.8} depthWrite={false} />
+          </mesh>
+          {/* inner dot */}
+          <mesh>
+            <sphereGeometry args={[0.05, 16, 16]} />
+            <meshBasicMaterial color={'#fde68a'} />
+          </mesh>
+          {/* label */}
+          <Text position={[0, 0.35, 0]} fontSize={0.16} color={'#fde68a'} anchorX="center" anchorY="middle" outlineWidth={0.008} outlineColor={'#111827'}>
+            变化节点
+          </Text>
+        </group>
+      ))}
     </group>
   );
 }

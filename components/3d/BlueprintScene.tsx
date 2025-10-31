@@ -5,6 +5,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import MainPath from './MainPath';
 import StageAreas from './StageAreas';
+import StageSideContent from './StageSideContent';
 import ProgressArrow from './ProgressArrow';
 import ActionLines from './ActionLines';
 import { useBlueprintStore } from '@/lib/store/blueprintStore';
@@ -58,6 +59,7 @@ export default function BlueprintScene() {
           <>
             {/* Stage regions rendered behind the path to reduce clutter */}
             <StageAreas blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
+            <StageSideContent blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
             <MainPath blueprintDefinition={blueprintDefinition} currentPosition={currentPosition} />
             <ProgressArrow position={currentPosition} />
             {actionLines.length > 0 && (

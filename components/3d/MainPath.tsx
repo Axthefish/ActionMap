@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Billboard } from '@react-three/drei';
+import { Text, Billboard, Html } from '@react-three/drei';
 import { BlueprintDefinition } from '@/lib/types';
 import MilestoneNode from './MilestoneNode';
 import * as THREE from 'three';
@@ -202,27 +202,16 @@ function PathSegment({ start, end, status, keySignals }: PathSegmentProps) {
         </mesh>
       )}
       
-      {/* Stage key signals rendered inside the segment */}
-      {keySignals.slice(0, 3).map((signal, i, arr) => {
-        // Spread texts along the segment's local Y axis
-        const t = (i + 1) / (arr.length + 1); // (0,1)
-        const y = -length / 2 + t * length; // local Y coord
-        const color = status === 'current' ? '#ffffff' : status === 'completed' ? '#d1fae5' : '#94a3b8';
-        const outline = status === 'current' ? '#00d4ff' : '#000000';
+      {/* Stage key signals rendered inside the segment as small chips (decluttered) */}
+      {keySignals.slice(0, 2).map((signal, i, arr) => {
+        const t = (i + 1) / (arr.length + 1);
+        const y = -length / 2 + t * length;
         return (
-          <Billboard key={`ks-${i}`} position={[0, y, 0]}>
-            <Text
-              fontSize={0.18}
-              color={color}
-              anchorX="center"
-              anchorY="middle"
-              maxWidth={1.2}
-              outlineWidth={status === 'current' ? 0.02 : 0.01}
-              outlineColor={outline}
-            >
+          <Html key={`ks-${i}`} position={[0, y, 0]} sprite distanceFactor={14} zIndexRange={[8, 0]}>
+            <span className="rounded bg-emerald-500/20 text-emerald-50 border border-emerald-400/30 px-2 py-[2px] text-xs whitespace-nowrap">
               {signal}
-            </Text>
-          </Billboard>
+            </span>
+          </Html>
         );
       })}
     </group>
