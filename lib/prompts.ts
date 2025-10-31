@@ -1,6 +1,6 @@
 import { SessionState } from './types';
 
-export const PROMPT_1_INITIALIZE = (userGoal: string) => `
+export const PROMPT_1_INITIALIZE = (userGoal: string, lang: 'en' | 'zh' = 'en') => `
 # ROLE: Expert Strategic Synthesizer & Visual Narrator
 
 # CONTEXT: The user interacts with a 3D "Living Blueprint". Our output must serve two purposes: 1) Provide structured data for the visual engine to render the initial blueprint. 2) Communicate with the user using the language of sketching and map-making to create an immersive experience.
@@ -60,13 +60,19 @@ export const PROMPT_1_INITIALIZE = (userGoal: string) => `
 }
 
 # IMPORTANT: Respond ONLY with the JSON object above. No other text before or after.
+
+# LANGUAGE & OUTPUT STYLE:
+# - User selected language: ${'${lang}'}
+# - All user-facing strings (stage_name, milestone content, narrative) must be written in ${'${lang === "zh" ? "Chinese" : "English"}'}.
+# - Keep variable/JSON keys in English.
 `;
 
 // Optimized: SessionState at the beginning for better caching
 export const PROMPT_2_STRATEGY_CYCLE = (
   sessionState: SessionState,
   userInput: string,
-  isFirstCycle: boolean
+  isFirstCycle: boolean,
+  lang: 'en' | 'zh' = 'en'
 ) => `
 # CURRENT SESSION STATE (Cached Context):
 ${JSON.stringify(sessionState, null, 2)}
@@ -122,4 +128,9 @@ ${isFirstCycle ? 'FIRST CYCLE - Calibration' : 'SUBSEQUENT CYCLE - Progress Upda
 }
 
 # IMPORTANT: Respond ONLY with the JSON object above. No other text before or after.
+
+# LANGUAGE & OUTPUT STYLE:
+# - User selected language: ${'${lang}'}
+# - All user-facing strings (narrative, new labels/content for action_lines) must be written in ${'${lang === "zh" ? "Chinese" : "English"}'}.
+# - Keep variable/JSON keys in English.
 `;

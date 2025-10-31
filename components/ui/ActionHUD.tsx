@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 import { Button } from "@/components/ui/button";
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { t } from '@/lib/i18n';
 
 export default function ActionHUD() {
   const [observations, setObservations] = useState('');
+  const lang = useLanguageStore((s) => s.language);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState('');
@@ -44,6 +47,7 @@ export default function ActionHUD() {
         body: JSON.stringify({
           session_id: sessionId,
           user_observations: observations,
+          language: lang,
         }),
       });
       
@@ -104,7 +108,7 @@ export default function ActionHUD() {
   return (
     <div className="h-full overflow-y-auto p-3">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-foreground">Actions</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t(lang, 'actions_title')}</h2>
         <span className="text-xs text-foreground/50">Cycle #{useBlueprintStore.getState().activeCycleIndex + 1}</span>
       </div>
       
@@ -115,7 +119,7 @@ export default function ActionHUD() {
         </div>
       ) : actionLines.length > 0 ? (
         <div className="mb-6 rounded bg-foreground/5 p-4 border border-white/10">
-          <p className="text-foreground/70">Click on an action line in the 3D view to see details</p>
+          <p className="text-foreground/70">{t(lang, 'click_action_hint')}</p>
         </div>
       ) : null}
       
@@ -128,7 +132,7 @@ export default function ActionHUD() {
       
       <div className="space-y-4">
         <div>
-          <label className="mb-2 block text-sm font-medium text-foreground/80">Observations</label>
+          <label className="mb-2 block text-sm font-medium text-foreground/80">{t(lang, 'observations')}</label>
           <textarea
             value={observations}
             onChange={(e) => setObservations(e.target.value)}

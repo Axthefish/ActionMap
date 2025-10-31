@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 import { Dialog, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { useLanguageStore } from '@/lib/store/languageStore';
 
 interface CalibrationDialogProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState("");
+  const lang = useLanguageStore((s) => s.language);
   
   const {
     sessionId,
@@ -49,6 +51,7 @@ export default function CalibrationDialog({ isOpen, onClose }: CalibrationDialog
         body: JSON.stringify({
           session_id: sessionId,
           calibration_feedback: feedback,
+          language: lang,
         }),
       });
       

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useBlueprintStore } from "@/lib/store/blueprintStore";
 import { Loader2 } from "lucide-react";
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { t } from '@/lib/i18n';
 
 interface GoalInputPageProps {
   onComplete: () => void;
@@ -16,6 +18,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [streamingNarrative, setStreamingNarrative] = useState("");
   const [slideOut, setSlideOut] = useState(false);
+  const lang = useLanguageStore((s) => s.language);
 
   const {
     setSessionId,
@@ -47,7 +50,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
       const response = await fetch("/api/init", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userGoal }),
+        body: JSON.stringify({ userGoal, language: lang }),
       });
 
       if (!response.ok) {
@@ -140,9 +143,7 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
         {flowStage === 'input' && (
           <div className="max-w-4xl w-full space-y-8 animate-in fade-in duration-500">
             <div className="text-center space-y-4">
-              <h1 className="text-5xl font-bold text-foreground">
-                What's Your Ambition?
-              </h1>
+              <h1 className="text-5xl font-bold text-foreground">What's Your Ambition?</h1>
               <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
                 Describe your aspiration in your own words. The more detail, the
                 better our AI can help you.
@@ -167,14 +168,14 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
               )}
 
               <div className="flex justify-center">
-                <button
+              <button
                   type="submit"
                   disabled={!userGoal.trim()}
                   className="px-12 py-4 bg-primary hover:bg-primary/90 disabled:bg-border text-white
                            font-semibold text-lg rounded-xl transition-all duration-200
                            hover:shadow-xl hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Analyze My Goal
+                {t(lang, 'analyze_goal')}
                 </button>
               </div>
             </form>
@@ -197,8 +198,8 @@ export default function GoalInputPage({ onComplete }: GoalInputPageProps) {
 
         {/* Stage 3: Streaming Narrative (Centered) */}
         {flowStage === 'streaming' && (
-          <div className={`fixed inset-0 z-20 flex items-center justify-center transition-all duration-1000 ${slideOut ? 'justify-start pl-6' : ''}`}>
-            <div className={`rounded-2xl p-8 border border-white/20 bg-foreground/10 backdrop-blur-xl animate-in fade-in duration-500 transition-all duration-1000 ${slideOut ? 'w-[28rem] max-w-[32rem]' : 'w-[48rem] max-w-[50rem]'}`}>
+          <div className={`fixed inset-0 z-20 flex items-center justify-center transition-all duration-1000 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${slideOut ? 'justify-start pl-8' : ''}`}>
+            <div className={`rounded-2xl p-8 border border-white/15 bg-foreground/10/50 backdrop-blur-xl animate-in fade-in duration-500 transition-all duration-1000 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${slideOut ? 'w-[28rem] max-w-[32rem]' : 'w-[48rem] max-w-[50rem]'}`}>
               <h2 className="text-2xl font-semibold text-foreground mb-4">Strategic Briefing</h2>
               <div className="prose prose-invert max-w-none">
                 <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">

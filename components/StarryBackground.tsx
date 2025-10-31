@@ -140,8 +140,8 @@ export default function StarryBackground() {
         }
       };
 
-      addCornerCluster(Math.floor(starCounts.mid * 0.12), +1, 2); // top-right more dense
-      addCornerCluster(Math.floor(starCounts.mid * 0.12), -1, 2); // bottom-left more dense
+      addCornerCluster(Math.floor(starCounts.mid * 0.18), +1, 2); // top-right denser
+      addCornerCluster(Math.floor(starCounts.mid * 0.18), -1, 2); // bottom-left denser
 
       // Side bands near left/right edges to avoid emptiness
       const addSideBand = (side: 'left' | 'right', count: number) => {
@@ -166,8 +166,8 @@ export default function StarryBackground() {
         }
       };
 
-      addSideBand('left', Math.floor(config.starCount * 0.08));
-      addSideBand('right', Math.floor(config.starCount * 0.08));
+      addSideBand('left', Math.floor(config.starCount * 0.15));
+      addSideBand('right', Math.floor(config.starCount * 0.15));
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {

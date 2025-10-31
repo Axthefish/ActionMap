@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Text, Billboard, Html } from '@react-three/drei';
+import { Text } from '@react-three/drei';
 import { BlueprintDefinition } from '@/lib/types';
 import MilestoneNode from './MilestoneNode';
 import * as THREE from 'three';
@@ -202,18 +202,7 @@ function PathSegment({ start, end, status, keySignals }: PathSegmentProps) {
         </mesh>
       )}
       
-      {/* Stage key signals rendered inside the segment as small chips (decluttered) */}
-      {keySignals.slice(0, 2).map((signal, i, arr) => {
-        const t = (i + 1) / (arr.length + 1);
-        const y = -length / 2 + t * length;
-        return (
-          <Html key={`ks-${i}`} position={[0, y, 0]} sprite distanceFactor={14} zIndexRange={[8, 0]}>
-            <span className="rounded bg-emerald-500/20 text-emerald-50 border border-emerald-400/30 px-2 py-[2px] text-xs whitespace-nowrap">
-              {signal}
-            </span>
-          </Html>
-        );
-      })}
+      {/* Key signals are now rendered as side branches (see StageBranches) */}
     </group>
   );
 }

@@ -7,8 +7,8 @@ import { InitRequest } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
   try {
-    const body: InitRequest = await req.json();
-    const { userGoal } = body;
+    const body: any = await req.json();
+    const { userGoal, language } = body;
     
     if (!userGoal || typeof userGoal !== 'string') {
       return new Response(
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       async start(controller) {
         try {
           // Generate blueprint using AI
-          const aiResponse = await generateBlueprint(userGoal);
+          const aiResponse = await generateBlueprint(userGoal, language === 'zh' ? 'zh' : 'en');
           
           // Extract data from AI response
           const { visual_engine_commands, narrative } = aiResponse;

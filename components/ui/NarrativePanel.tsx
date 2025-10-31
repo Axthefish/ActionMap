@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useBlueprintStore } from '@/lib/store/blueprintStore';
 import ReactMarkdown from 'react-markdown';
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { t } from '@/lib/i18n';
 
 export default function NarrativePanel() {
   const narrative = useBlueprintStore((state) => state.narrative);
+  const lang = useLanguageStore((s) => s.language);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   
@@ -32,10 +35,9 @@ export default function NarrativePanel() {
   }, [narrative]);
   
   return (
-    <div className="h-full overflow-y-auto p-6 bg-transparent border-r border-white/10">
-      <h2 className="text-apple-h2 font-semibold mb-4 text-foreground">
-        Strategic Briefing
-      </h2>
+    <div className="h-full p-0">
+      <div className="h-full overflow-y-auto p-6 bg-transparent border-r border-white/10">
+      <h2 className="text-apple-h2 font-semibold mb-4 text-foreground">{t(lang, 'strategic_briefing')}</h2>
       
       <div className="prose prose-invert max-w-none text-apple-body leading-8 tracking-[-0.005em] prose-p:mb-4 prose-ol:my-3 prose-ul:my-3 prose-li:my-1">
         <ReactMarkdown 
@@ -57,12 +59,13 @@ export default function NarrativePanel() {
           <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-1 rounded-sm"></span>
         )}
       </div>
-      
+
       {!narrative && (
-        <p className="text-foreground/50 italic text-apple-caption">
-          Waiting for blueprint initialization...
+        <p className="px-6 pt-3 text-foreground/50 italic text-apple-caption">
+          {t(lang, 'waiting_init')}
         </p>
       )}
+    </div>
     </div>
   );
 }

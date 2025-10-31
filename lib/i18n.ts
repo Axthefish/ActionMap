@@ -17,6 +17,13 @@ export const dict: Record<'en' | 'zh', LangDict> = {
     open: 'Open',
     close: 'Close',
     language: 'Language',
+    strategic_briefing: 'Strategic Briefing',
+    actions_title: 'Actions',
+    observations: 'Observations',
+    analyze_goal: 'Analyze My Goal',
+    click_action_hint: 'Click on an action line in the 3D view to see details',
+    waiting_init: 'Waiting for blueprint initialization...',
+    inflection: 'Inflection',
   },
   zh: {
     app_title: 'Dynamic Blueprint',
@@ -34,6 +41,13 @@ export const dict: Record<'en' | 'zh', LangDict> = {
     open: '打开',
     close: '关闭',
     language: '语言',
+    strategic_briefing: '战略简报',
+    actions_title: '行动',
+    observations: '观察与进展',
+    analyze_goal: '分析我的目标',
+    click_action_hint: '点击 3D 视图中的支线查看详情',
+    waiting_init: '等待蓝图初始化…',
+    inflection: '变化节点',
   },
 };
 

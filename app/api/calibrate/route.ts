@@ -7,8 +7,8 @@ import { CalibrateRequest, SessionState } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
   try {
-    const body: CalibrateRequest = await req.json();
-    const { session_id, calibration_feedback } = body;
+    const body: any = await req.json();
+    const { session_id, calibration_feedback, language } = body;
     
     if (!session_id || !calibration_feedback) {
       return new Response(

@@ -97,13 +97,13 @@ async function getOrCreateCache(sessionState: SessionState): Promise<string | un
 }
 
 // Generate initial blueprint (PROMPT 1)
-export async function generateBlueprint(userGoal: string): Promise<Omit<InitResponse, 'session_id'>> {
+export async function generateBlueprint(userGoal: string, lang: 'en' | 'zh' = 'en'): Promise<Omit<InitResponse, 'session_id'>> {
   console.log('[AI] Generating blueprint for goal:', userGoal);
   
   const result = await parseJSONWithRetry<Omit<InitResponse, 'session_id'>>(async () => {
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: PROMPT_1_INITIALIZE(userGoal),
+      contents: PROMPT_1_INITIALIZE(userGoal, lang),
       config: {
         temperature: 0.4, // Lower temperature for more deterministic JSON output
       },
@@ -124,7 +124,8 @@ export async function generateBlueprint(userGoal: string): Promise<Omit<InitResp
 export async function runStrategyCycle(
   sessionState: SessionState,
   userInput: string,
-  isFirstCycle: boolean
+  isFirstCycle: boolean,
+  lang: 'en' | 'zh' = 'en'
 ): Promise<Omit<CalibrateResponse | CycleResponse, 'session_id'>> {
   console.log('[AI] Running strategy cycle, first cycle:', isFirstCycle);
   
@@ -132,7 +133,7 @@ export async function runStrategyCycle(
   const cacheName = await getOrCreateCache(sessionState);
   
   const result = await parseJSONWithRetry<Omit<CalibrateResponse | CycleResponse, 'session_id'>>(async () => {
-    const promptContent = PROMPT_2_STRATEGY_CYCLE(sessionState, userInput, isFirstCycle);
+    const promptContent = PROMPT_2_STRATEGY_CYCLE(sessionState, userInput, isFirstCycle, lang);
     
     const config: any = {
       temperature: 0.4, // Lower temperature for more deterministic JSON output

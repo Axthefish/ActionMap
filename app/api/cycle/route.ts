@@ -7,8 +7,8 @@ import { CycleRequest, SessionState } from '@/lib/types';
 
 export async function POST(req: NextRequest) {
   try {
-    const body: CycleRequest = await req.json();
-    const { session_id, user_observations } = body;
+    const body: any = await req.json();
+    const { session_id, user_observations, language } = body;
     
     if (!session_id || !user_observations) {
       return new Response(
