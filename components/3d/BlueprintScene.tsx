@@ -58,7 +58,7 @@ export default function BlueprintScene() {
         )}
       </Suspense>
       
-      {/* Camera controls optimized for top-down viewing */}
+      {/* Camera controls optimized for top-down viewing with 3D tilt retained */}
       <OrbitControls
         ref={controlsRef}
         enableZoom={true}
@@ -66,11 +66,11 @@ export default function BlueprintScene() {
         enableRotate={true}
         minDistance={4}
         maxDistance={50}
-        // Polar angle near 0 is top-down. Constrain to a shallow tilt.
-        minPolarAngle={0.05}
-        maxPolarAngle={0.55}
-        minAzimuthAngle={-Math.PI / 8}
-        maxAzimuthAngle={Math.PI / 8}
+        // Allow a bit more tilt/azimuth so 3D cues remain visible
+        minPolarAngle={0.08}
+        maxPolarAngle={0.75}
+        minAzimuthAngle={-Math.PI / 3}
+        maxAzimuthAngle={Math.PI / 3}
         enableDamping={true}
         dampingFactor={0.05}
       />

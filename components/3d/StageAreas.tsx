@@ -51,25 +51,26 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
     <group>
       {segments.map((s, i) => (
         <group key={`stage-area-${i}`} position={[(s.startX + s.endX) / 2, 0, 0]}>
-          {/* Flat area on ground (XZ plane) for top-down view */}
-          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[s.endX - s.startX, areaDepth]} />
-            <meshBasicMaterial
+          {/* Slightly extruded area plate to keep 3D cues */}
+          <mesh position={[0, 0.01, 0]}>
+            <boxGeometry args={[s.endX - s.startX, 0.02, areaDepth]} />
+            <meshStandardMaterial
               color={getAreaColor(s.status)}
+              metalness={0.1}
+              roughness={0.9}
               transparent
               opacity={getAreaOpacity(s.status)}
-              depthWrite={false}
             />
           </mesh>
 
-          {/* Boundary lines along Z (visible from top) */}
-          <mesh position={[-(s.endX - s.startX) / 2, 0.01, 0]}>
-            <boxGeometry args={[0.02, 0.02, areaDepth]} />
-            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.7} transparent depthWrite={false} />
+          {/* Raised curbs to add depth on both edges */}
+          <mesh position={[-(s.endX - s.startX) / 2, 0.135, 0]}>
+            <boxGeometry args={[0.02, 0.25, areaDepth]} />
+            <meshStandardMaterial color={getBorderColor(s.status)} transparent opacity={0.6} />
           </mesh>
-          <mesh position={[(s.endX - s.startX) / 2, 0.01, 0]}>
-            <boxGeometry args={[0.02, 0.02, areaDepth]} />
-            <meshBasicMaterial color={getBorderColor(s.status)} opacity={0.7} transparent depthWrite={false} />
+          <mesh position={[(s.endX - s.startX) / 2, 0.135, 0]}>
+            <boxGeometry args={[0.02, 0.25, areaDepth]} />
+            <meshStandardMaterial color={getBorderColor(s.status)} transparent opacity={0.6} />
           </mesh>
 
           {/* Edge text at the top side of area (Html overlay for crispness) */}
@@ -83,7 +84,7 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
         </group>
       ))}
 
-      {/* Inflection markers at boundaries between stages (on ground) */}
+      {/* Inflection markers at boundaries between stages (ground + vertical beam) */}
       {segments.slice(0, -1).map((s, i) => (
         <group key={`infl-${i}`} position={[s.endX, 0.02, 0]}>
           {/* glow ring on ground */}
@@ -95,6 +96,11 @@ export default function StageAreas({ blueprintDefinition, currentPosition }: Sta
           <mesh position={[0, 0.002, 0]}>
             <circleGeometry args={[0.06, 24]} />
             <meshBasicMaterial color={'#fde68a'} />
+          </mesh>
+          {/* vertical light beam for 3D cue */}
+          <mesh position={[0, 0.45, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.9, 16]} />
+            <meshStandardMaterial color={'#fbbf24'} emissive={'#fbbf24'} emissiveIntensity={0.6} transparent opacity={0.6} />
           </mesh>
           {/* label */}
           <Html position={[0, 0.02, 0.35]} sprite distanceFactor={12}>

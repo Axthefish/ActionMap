@@ -1,12 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useLanguageStore } from '@/lib/store/languageStore';
+import { t } from '@/lib/i18n';
+import LanguageToggle from './LanguageToggle';
+import ResumeSessionDialog from './ResumeSessionDialog';
+import ReviewSessionsDialog from './ReviewSessionsDialog';
 
 interface WelcomePageProps {
   onStartNewGoal: () => void;
+  onResume: () => void;
 }
 
-export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
+export default function WelcomePage({ onStartNewGoal, onResume }: WelcomePageProps) {
+  const lang = useLanguageStore((s) => s.language);
+  const [showResume, setShowResume] = useState(false);
+  const [showReview, setShowReview] = useState(false);
   return (
     <div className="relative h-screen w-screen overflow-hidden">
       {/* Header */}
@@ -28,8 +37,9 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
               </linearGradient>
             </defs>
           </svg>
-          <span className="text-2xl font-bold text-foreground">Dynamic Blueprint</span>
+          <span className="text-2xl font-bold text-foreground">{t(lang, 'app_title')}</span>
         </div>
+        <LanguageToggle />
       </header>
 
       {/* Main Content */}
@@ -38,12 +48,8 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
           {/* Left Column - Options */}
           <div className="flex flex-col justify-center space-y-6">
             <div className="mb-8">
-              <h1 className="text-5xl font-bold text-foreground mb-3">
-                Welcome back, User
-              </h1>
-              <p className="text-xl text-foreground/60">
-                Ready to shape your future?
-              </p>
+              <h1 className="text-5xl font-bold text-foreground mb-3">{t(lang, 'welcome_title')}</h1>
+              <p className="text-xl text-foreground/60">{t(lang, 'welcome_sub')}</p>
             </div>
 
             {/* Option Cards */}
@@ -51,30 +57,18 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
               onClick={onStartNewGoal}
               className="group glass-strong rounded-2xl p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-white/10 hover:border-primary/30"
             >
-              <h3 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition">
-                Start a New Goal
-              </h3>
-              <p className="text-foreground/60 text-base">
-                Define your next ambition and create a clear path forward.
-              </p>
+              <h3 className="text-2xl font-semibold text-foreground mb-3 group-hover:text-primary transition">{t(lang, 'start_goal')}</h3>
+              <p className="text-foreground/60 text-base">{t(lang, 'start_goal_desc')}</p>
             </button>
 
-            <button className="group glass-strong rounded-2xl p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-white/10 hover:border-accent/30 opacity-60 cursor-not-allowed">
-              <h3 className="text-2xl font-semibold text-foreground/60 mb-3">
-                Resume Session
-              </h3>
-              <p className="text-foreground/40 text-base">
-                Continue defining your current project.
-              </p>
+            <button onClick={() => setShowResume(true)} className="group glass-strong rounded-2xl p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-white/10 hover:border-accent/30">
+              <h3 className="text-2xl font-semibold text-foreground mb-3">{t(lang, 'resume_session')}</h3>
+              <p className="text-foreground/60 text-base">{t(lang, 'resume_session_desc')}</p>
             </button>
 
-            <button className="group glass-strong rounded-2xl p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-white/10 hover:border-success/30 opacity-60 cursor-not-allowed">
-              <h3 className="text-2xl font-semibold text-foreground/60 mb-3">
-                Review Past Sessions
-              </h3>
-              <p className="text-foreground/40 text-base">
-                Reflect on your journey and insights.
-              </p>
+            <button onClick={() => setShowReview(true)} className="group glass-strong rounded-2xl p-8 text-left transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border border-white/10 hover:border-success/30">
+              <h3 className="text-2xl font-semibold text-foreground mb-3">{t(lang, 'review_sessions')}</h3>
+              <p className="text-foreground/60 text-base">{t(lang, 'review_sessions_desc')}</p>
             </button>
           </div>
 
@@ -130,6 +124,10 @@ export default function WelcomePage({ onStartNewGoal }: WelcomePageProps) {
           </div>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <ResumeSessionDialog open={showResume} onClose={() => setShowResume(false)} onResumed={onResume} />
+      <ReviewSessionsDialog open={showReview} onClose={() => setShowReview(false)} />
 
       {/* Footer Quote */}
       <footer className="absolute bottom-8 left-0 right-0 flex justify-center z-10">

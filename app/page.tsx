@@ -40,7 +40,7 @@ export default function Home() {
   
   // Show welcome page
   if (stage === 'welcome') {
-    return <WelcomePage onStartNewGoal={() => setStage('input')} />;
+    return <WelcomePage onStartNewGoal={() => setStage('input')} onResume={() => setStage('dashboard')} />;
   }
   
   // Show goal input page
