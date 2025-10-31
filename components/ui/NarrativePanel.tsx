@@ -17,15 +17,16 @@ export default function NarrativePanel() {
     setDisplayedText('');
     
     let currentIndex = 0;
+    const step = 2; // type 2 chars per tick to reduce reflow
     const interval = setInterval(() => {
       if (currentIndex < narrative.length) {
-        setDisplayedText(narrative.slice(0, currentIndex + 1));
-        currentIndex++;
+        setDisplayedText(narrative.slice(0, currentIndex + step));
+        currentIndex += step;
       } else {
         setIsTyping(false);
         clearInterval(interval);
       }
-    }, 20); // Typing speed
+    }, 24);
     
     return () => clearInterval(interval);
   }, [narrative]);

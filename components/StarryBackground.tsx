@@ -117,6 +117,31 @@ export default function StarryBackground() {
       addScattered(Math.floor(starCounts.far * 0.15), 1);
       addScattered(Math.floor(starCounts.mid * 0.15), 2);
       addScattered(Math.floor(starCounts.near * 0.15), 3);
+
+      // Corner clusters: top-right and bottom-left with same flow direction
+      const addCornerCluster = (count: number, sign: 1 | -1, z: number) => {
+        for (let i = 0; i < count; i++) {
+          const baseOpacity = Math.random() * 0.35 + 0.25;
+          starsRef.current.push({
+            z,
+            size: Math.random() * (z === 3 ? 2.0 : 1.4) + (z === 3 ? 1.0 : 0.6),
+            opacity: baseOpacity,
+            baseOpacity,
+            twinkleSpeed: Math.random() * 1.2 + 0.5,
+            twinklePhase: Math.random() * Math.PI * 2,
+            color: starColors[Math.floor(Math.random() * starColors.length)],
+            // u0 biased near extremes to emphasize corners
+            u0: (sign * (bandWidth * (1.2 + Math.random() * 0.6))),
+            bandOffset: (Math.random() - 0.5) * (canvas.height * 0.25),
+            bandSpeed: 40 + Math.random() * 25,
+            curveAmp: 20 + Math.random() * 24,
+            curveFreq: 0.012 + Math.random() * 0.02,
+          });
+        }
+      };
+
+      addCornerCluster(Math.floor(starCounts.mid * 0.08), +1, 2); // top-right
+      addCornerCluster(Math.floor(starCounts.mid * 0.08), -1, 2); // bottom-left
       
       // Mid stars
       for (let i = 0; i < starCounts.mid; i++) {
@@ -192,7 +217,8 @@ export default function StarryBackground() {
         const centerX = width / 2;
         const centerY = height / 2;
 
-        const u = (star.u0 + rotationRef.current * star.bandSpeed * (1 / star.z)) % (width * 2) - width;
+        // Reverse flow so stars travel from bottom-left toward top-right
+        const u = (star.u0 - rotationRef.current * star.bandSpeed * (1 / star.z)) % (width * 2) - width;
         const v = star.bandOffset + Math.sin(u * star.curveFreq + star.twinklePhase) * star.curveAmp * (1 / star.z);
 
         // rotate back to screen coords

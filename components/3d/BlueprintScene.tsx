@@ -39,7 +39,7 @@ export default function BlueprintScene() {
       <SceneStars />
       
       {/* Sync camera to arrow first-person position */}
-      <FirstPersonCamera arrowPosition={currentPosition} />
+      <FirstPersonCamera arrowPosition={currentPosition} hasBlueprint={!!blueprintDefinition} />
 
       {/* Blueprint elements */}
       <Suspense fallback={null}>
@@ -100,17 +100,18 @@ function SceneStars() {
 }
 
 // Camera that snaps to arrow (first-person) whenever position changes
-function FirstPersonCamera({ arrowPosition }: { arrowPosition: number }) {
+function FirstPersonCamera({ arrowPosition, hasBlueprint }: { arrowPosition: number; hasBlueprint: boolean }) {
   const { camera } = useThree();
   const initialSetRef = useRef(false);
   useEffect(() => {
     if (initialSetRef.current) return;
+    if (!hasBlueprint) return;
     const pathLength = 10;
     const x = -pathLength / 2 + arrowPosition * pathLength;
     camera.position.set(x, 1.2, 2.5);
     camera.lookAt(x + 1, 0.6, 0);
     initialSetRef.current = true; // only set on first render
-  }, [arrowPosition, camera]);
+  }, [arrowPosition, hasBlueprint, camera]);
   return null;
 }
 
