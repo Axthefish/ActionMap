@@ -11,9 +11,7 @@ interface ProgressArrowProps {
 
 export default function ProgressArrow({ position }: ProgressArrowProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const spotLightRef = useRef<THREE.SpotLight>(null);
   const trailRef = useRef<THREE.Points>(null);
-  const energyRingsRef = useRef<THREE.Group>(null);
   const pathLength = 10;
   
   // Animated position with smooth easing
@@ -38,19 +36,14 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
     return { positions, opacities };
   }, []);
   
-  // Subtle floating animation (top-down, keep low height)
+  // Subtle animation (top-down mode keeps arrow close to the ground plane)
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
     
     if (groupRef.current) {
-      const floatY = Math.sin(time * 1.5) * 0.02;
-      groupRef.current.position.y = 0.2 + floatY;
-      
-      // Subtle rotation wobble
-      groupRef.current.rotation.z = Math.sin(time * 2) * 0.05;
+      const floatY = Math.sin(time * 1.2) * 0.02;
+      groupRef.current.position.y = 0.08 + floatY;
     }
-    
-    // Remove spotlight pulsing for top-down map clarity
     
     // Trail animation
     if (trailRef.current) {
@@ -58,14 +51,9 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
       const positions = geometry.attributes.position.array as Float32Array;
       
       for (let i = 0; i < positions.length / 3; i++) {
-        positions[i * 3 + 1] = Math.sin(time * 3 + i * 0.2) * 0.02;
+        positions[i * 3 + 2] = Math.sin(time * 3 + i * 0.2) * 0.02; // wiggle sideways in plane
       }
       geometry.attributes.position.needsUpdate = true;
-    }
-    
-    // Energy rings rotation
-    if (energyRingsRef.current) {
-      energyRingsRef.current.rotation.z = time * 2;
     }
   });
   
@@ -74,9 +62,9 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
       ref={groupRef}
       position-x={animatedPosition.to((p) => -pathLength / 2 + p * pathLength)}
     >
-      {/* Flat-ish arrow for top-down view (axis along +Z) */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.25, 0.5, 6]} />
+      {/* Main arrow head: flattened to lie in the XZ plane, pointing +X */}
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[0.25, 0, 0]}>
+        <coneGeometry args={[0.22, 0.44, 6]} />
         <meshPhysicalMaterial
           color="#ff6b6b"
           emissive="#ff6b6b"
@@ -87,9 +75,9 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
         />
       </mesh>
       
-      {/* Arrow shaft */}
-      <mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.08, 0.08, 0.3, 8]} />
+      {/* Arrow shaft lying on plane */}
+      <mesh rotation={[0, 0, -Math.PI / 2]} position={[-0.15, 0, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.4, 8]} />
         <meshPhysicalMaterial
           color="#ff6b6b"
           emissive="#ff6b6b"
@@ -99,8 +87,8 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
         />
       </mesh>
       
-      {/* Glowing trail particles */}
-      <points ref={trailRef} position={[0, 0.3, 0]}>
+      {/* Glowing trail particles (drawn behind along -X) */}
+      <points ref={trailRef} position={[0, 0.02, 0]}>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
@@ -112,7 +100,7 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.08}
+          size={0.06}
           color="#ff6b6b"
           transparent
           opacity={0.6}
@@ -122,34 +110,6 @@ export default function ProgressArrow({ position }: ProgressArrowProps) {
         />
       </points>
       
-      {/* Energy rings field */}
-      <group ref={energyRingsRef}>
-        {[0.5, 0.7, 0.9].map((radius, i) => (
-          <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[radius, radius + 0.03, 32]} />
-            <meshBasicMaterial
-              color="#ff6b6b"
-              transparent
-              opacity={0.3 - i * 0.08}
-              side={THREE.DoubleSide}
-              blending={THREE.AdditiveBlending}
-            />
-          </mesh>
-        ))}
-      </group>
-      
-      {/* Outer glow sphere */}
-      <mesh>
-        <sphereGeometry args={[0.5, 16, 16]} />
-        <meshBasicMaterial
-          color="#ff6b6b"
-          transparent
-          opacity={0.1}
-          side={THREE.BackSide}
-        />
-      </mesh>
-      
-      {/* No spotlight in top-down mode */}
     </animated.group>
   );
 }

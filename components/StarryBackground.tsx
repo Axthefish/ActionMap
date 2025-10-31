@@ -230,21 +230,23 @@ export default function StarryBackground() {
       ctx.fillStyle = 'hsl(0, 0%, 7%)'; // Match background color
       ctx.fillRect(0, 0, width, height);
       
-      rotationRef.current += 0.03 * config.animationSpeed; // drives band movement
+      rotationRef.current += 0.02 * config.animationSpeed; // drives band movement
       
       // Draw stars with twinkling effect
       const currentTime = Date.now() * 0.001; // Convert to seconds
       
       starsRef.current.forEach((star) => {
         // Galaxy bands: move along u with sine arc on v, then rotate -45deg
-        const theta = Math.PI / 4; // diagonal orientation (opposite direction)
+        const theta = Math.PI / 4; // diagonal orientation (bottom-left -> top-right)
         const cosT = Math.cos(theta);
         const sinT = Math.sin(theta);
         const centerX = width / 2;
         const centerY = height / 2;
 
         // Reverse flow so stars travel from bottom-left toward top-right
-        const u = (star.u0 - rotationRef.current * star.bandSpeed * (1 / star.z)) % (width * 2) - width;
+        const cycle = Math.max(canvas.width, canvas.height);
+        const uRaw = star.u0 - rotationRef.current * star.bandSpeed * (1 / star.z);
+        let u = ((uRaw % (cycle * 2)) + (cycle * 2)) % (cycle * 2) - cycle;
         const v = star.bandOffset + Math.sin(u * star.curveFreq + star.twinklePhase) * star.curveAmp * (1 / star.z);
 
         // rotate back to screen coords

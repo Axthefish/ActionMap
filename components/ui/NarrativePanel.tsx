@@ -32,7 +32,7 @@ export default function NarrativePanel() {
   }, [narrative]);
   
   return (
-    <div className="h-full overflow-y-auto p-6 glass-strong border-r border-border/20">
+    <div className="h-full overflow-y-auto p-6 bg-transparent border-r border-white/10">
       <h2 className="text-apple-h2 font-semibold mb-4 text-foreground">
         Strategic Briefing
       </h2>

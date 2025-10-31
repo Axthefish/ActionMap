@@ -122,8 +122,8 @@ export default function MilestoneNode({ position, node }: MilestoneNodeProps) {
         />
       </mesh>
       
-      {/* Inner rotating ring (flat on ground for top-down view) */}
-      <mesh ref={ringRef} rotation={[0, 0, 0]}>
+      {/* Inner rotating ring */}
+      <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.3, 0.35, 32]} />
         <meshBasicMaterial
           color={emissiveColor}
@@ -134,7 +134,7 @@ export default function MilestoneNode({ position, node }: MilestoneNodeProps) {
       </mesh>
       
       {/* Outer expanding ring */}
-      <mesh ref={outerRingRef} rotation={[0, 0, 0]}>
+      <mesh ref={outerRingRef} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.4, 0.43, 32]} />
         <meshBasicMaterial
           color={emissiveColor}
